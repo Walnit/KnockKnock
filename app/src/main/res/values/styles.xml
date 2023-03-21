@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="m3_button" parent="@style/Widget.Material3.Button.IconButton.Filled">
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>
