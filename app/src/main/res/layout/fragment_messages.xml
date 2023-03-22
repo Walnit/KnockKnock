@@ -16,12 +16,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="?attr/colorOnPrimary" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/messages_recyclerview"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@+id/messages_inputlayout"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messages_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:overScrollMode="never" />
+    </FrameLayout>
 
     <Button
         android:id="@+id/messages_attach_btn"
@@ -29,11 +37,12 @@
         android:layout_height="52dp"
         android:layout_marginStart="16dp"
         android:background="@drawable/round_btn"
-        android:paddingLeft="12dp"
+        android:paddingStart="12dp"
         app:icon="@drawable/baseline_attach_file_24"
         app:layout_constraintBottom_toBottomOf="@id/messages_inputlayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/messages_inputlayout" />
+        app:layout_constraintTop_toTopOf="@id/messages_inputlayout"
+        tools:ignore="RtlSymmetry" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/messages_inputlayout"
@@ -52,7 +61,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Message"
-            android:paddingEnd="64dp" />
+            android:paddingEnd="64dp"
+            tools:ignore="HardcodedText,RtlSymmetry" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ImageButton
@@ -64,6 +74,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/messages_inputlayout"
         app:layout_constraintEnd_toEndOf="@+id/messages_inputlayout"
         app:layout_constraintTop_toTopOf="@+id/messages_inputlayout"
-        app:srcCompat="@drawable/baseline_send_24" />
+        app:srcCompat="@drawable/baseline_send_24"
+        android:contentDescription="send message"
+        tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

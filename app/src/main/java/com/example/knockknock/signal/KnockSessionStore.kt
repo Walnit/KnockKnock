@@ -1,4 +1,4 @@
-package com.walnit.knockknock.signal
+package com.example.knockknock.signal
 
 import android.content.Context
 import android.util.Base64
@@ -10,6 +10,7 @@ import org.whispersystems.libsignal.state.SessionState
 import org.whispersystems.libsignal.state.SessionStore
 import org.whispersystems.libsignal.state.StorageProtos
 
+@Suppress("unused")
 class KnockSessionStore(context: Context) : SessionStore {
 
     // Get Session store

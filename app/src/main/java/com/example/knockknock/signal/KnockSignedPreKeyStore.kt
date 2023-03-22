@@ -1,4 +1,6 @@
-package com.walnit.knockknock.signal
+@file:Suppress("unused")
+
+package com.example.knockknock.signal
 
 import android.content.Context
 import android.util.Base64
@@ -7,6 +9,7 @@ import androidx.security.crypto.MasterKey
 import org.whispersystems.libsignal.state.SignedPreKeyRecord
 import org.whispersystems.libsignal.state.SignedPreKeyStore
 
+@Suppress("unused")
 class KnockSignedPreKeyStore(context: Context) : SignedPreKeyStore {
 
     // Get SignedPreKey store

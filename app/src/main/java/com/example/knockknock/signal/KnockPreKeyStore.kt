@@ -1,4 +1,4 @@
-package com.walnit.knockknock.signal
+package com.example.knockknock.signal
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +9,7 @@ import org.whispersystems.libsignal.state.PreKeyRecord
 import org.whispersystems.libsignal.state.PreKeyStore
 import org.whispersystems.libsignal.util.KeyHelper
 
-
+@Suppress("unused")
 class KnockPreKeyStore(context: Context)  : PreKeyStore {
 
     // Get PreKey store

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/chatslist_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,7 +18,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_person_24" />
+            app:srcCompat="@drawable/baseline_person_24"
+            android:contentDescription="profile picture"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/chatslist_card_title"
@@ -31,7 +32,8 @@
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/chatslist_card_profile"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/chatslist_card_preview"
@@ -40,6 +42,7 @@
             android:text="TextView"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/chatslist_card_title"
-            app:layout_constraintTop_toBottomOf="@+id/chatslist_card_title" />
+            app:layout_constraintTop_toBottomOf="@+id/chatslist_card_title"
+            tools:ignore="HardcodedText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

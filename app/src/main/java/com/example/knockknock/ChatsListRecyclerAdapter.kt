@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.example.knockknock
 
 import android.view.LayoutInflater
@@ -6,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.os.bundleOf
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-class ChatsListRecyclerAdapter(val chats: ArrayList<String>) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
+@Suppress("unused", "unused", "unused", "unused", "unused")
+class ChatsListRecyclerAdapter(private val chats: ArrayList<String>) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v : View = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_chatslist,parent,false)
@@ -27,9 +29,9 @@ class ChatsListRecyclerAdapter(val chats: ArrayList<String>) : RecyclerView.Adap
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var chatProfile: ImageView
-        var chatTitle: TextView
-        var chatPreview: TextView
+        private var chatProfile: ImageView
+        private var chatTitle: TextView
+        private var chatPreview: TextView
         init {
             chatProfile = itemView.findViewById(R.id.chatslist_card_profile)
             chatTitle = itemView.findViewById(R.id.chatslist_card_title)
@@ -41,8 +43,8 @@ class ChatsListRecyclerAdapter(val chats: ArrayList<String>) : RecyclerView.Adap
 
         }
         fun bindItems(chat: String){
-//            chatTitle.text = chp.title
-//            chatD.text = chp.detail
+            chatTitle.text = chat
+//            chatPreview.text = chp.detail
 //            itemImage.setImageResource(chp.images)
         }
     }

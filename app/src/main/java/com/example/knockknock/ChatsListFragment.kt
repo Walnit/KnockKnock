@@ -19,7 +19,7 @@ class ChatsListFragment : Fragment() {
         // Populate RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.chatslist_recyclerview)
         val layoutManager = LinearLayoutManager(context)
-        val adapter = ChatsListRecyclerAdapter(arrayListOf("","","","",""))
+        val adapter = ChatsListRecyclerAdapter(arrayListOf("TextView","janjan","","",""))
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
 

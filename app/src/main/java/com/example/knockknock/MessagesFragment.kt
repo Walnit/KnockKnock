@@ -1,11 +1,9 @@
 package com.example.knockknock
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -36,29 +34,25 @@ class MessagesFragment : Fragment() {
         if (target != null) {
 
             val recyclerView = view.findViewById<RecyclerView>(R.id.messages_recyclerview)
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-            recyclerView.adapter = MessageDatabase(requireContext()).getMessages(target)
-                ?.let { MessagesRecyclerAdapter(it) }
+            val layoutManager = LinearLayoutManager(requireContext())
+            layoutManager.stackFromEnd = true
+            recyclerView.layoutManager = layoutManager
 
-
+            recyclerView.adapter = MessageDatabase.getMessages(target, requireContext())
+            ?.let { MessagesRecyclerAdapter(it) }
 
             view.findViewById<ImageButton>(R.id.messages_send_imgbtn).setOnClickListener {
                 val editText = view.findViewById<TextInputEditText>(R.id.messages_edittext)
                 if (!editText.text.isNullOrBlank()) {
-                    MessageDatabase(requireContext()).writeMessages(target, arrayOf(KnockMessage(target,
-                        System.currentTimeMillis(), editText.text.toString().toByteArray(StandardCharsets.UTF_8), KnockMessage.KnockMessageType.TEXT)))
+                    MessageDatabase.writeMessages(target, arrayOf(KnockMessage(target,
+                        System.currentTimeMillis(), editText.text.toString().toByteArray(StandardCharsets.UTF_8), KnockMessage.KnockMessageType.TEXT)), requireContext())
+                    editText.text!!.clear()
+                    recyclerView.adapter = MessageDatabase.getMessages(target, requireContext())
+                        ?.let { MessagesRecyclerAdapter(it) }
                 }
             }
         }
-
-
-        // Populate RecyclerView
-//        val recyclerView = view.findViewById<RecyclerView>(R.id.chatslist_recyclerview)
-//        val layoutManager = LinearLayoutManager(context)
-//        val adapter = ChatsListRecyclerAdapter(arrayListOf("","","","",""))
-//        recyclerView.layoutManager = layoutManager
-//        recyclerView.adapter = adapter
 
         return view
     }

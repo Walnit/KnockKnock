@@ -1,7 +1,7 @@
-package com.walnit.knockknock.structures
+package com.example.knockknock.structures
 
 import android.content.Context
-import com.walnit.knockknock.signal.KnockPreKeyStore
+import com.example.knockknock.signal.KnockPreKeyStore
 import org.whispersystems.libsignal.IdentityKey
 import org.whispersystems.libsignal.ecc.Curve
 import org.whispersystems.libsignal.ecc.ECPublicKey
@@ -9,26 +9,27 @@ import org.whispersystems.libsignal.state.PreKeyBundle
 import org.whispersystems.libsignal.state.PreKeyRecord
 import org.whispersystems.libsignal.state.SignedPreKeyRecord
 
+@Suppress("unused")
 class KnockClient(
     val name : String,
-    val registrationID : Int,
-    val deviceID : Int,
-    val preKeyID : Int,
-    val preKeyPublic : ECPublicKey,
-    val signedPreKeyId : Int,
-    val signedPreKeyPublic : ECPublicKey,
-    val signedPreKeySignature : ByteArray,
-    val identityKey : IdentityKey
+    private val registrationID : Int,
+    private val deviceID : Int,
+    private val preKeyID : Int,
+    private val preKeyPublic : ECPublicKey,
+    private val signedPreKeyId : Int,
+    private val signedPreKeyPublic : ECPublicKey,
+    private val signedPreKeySignature : ByteArray,
+    private val identityKey : IdentityKey
 ) {
     companion object {
         fun newClient(context: Context, name: String, registrationID: Int, deviceID: Int, signedPreKeyRecord: SignedPreKeyRecord, identityKey: IdentityKey, preKeyRecord: PreKeyRecord? = null) : KnockClient {
-            if (preKeyRecord == null) {
+            return if (preKeyRecord == null) {
                 val preKeyStore = KnockPreKeyStore(context)
                 val preKeyID = preKeyStore.getNewPreKeyID()
-                return KnockClient(name, registrationID, deviceID, preKeyID, preKeyStore.loadPreKey(preKeyID).keyPair.publicKey,
-                signedPreKeyRecord.id, signedPreKeyRecord.keyPair.publicKey, signedPreKeyRecord.signature, identityKey)
+                KnockClient(name, registrationID, deviceID, preKeyID, preKeyStore.loadPreKey(preKeyID).keyPair.publicKey,
+                    signedPreKeyRecord.id, signedPreKeyRecord.keyPair.publicKey, signedPreKeyRecord.signature, identityKey)
             } else {
-                return KnockClient(name, registrationID, deviceID, preKeyRecord.id, preKeyRecord.keyPair.publicKey,
+                KnockClient(name, registrationID, deviceID, preKeyRecord.id, preKeyRecord.keyPair.publicKey,
                     signedPreKeyRecord.id, signedPreKeyRecord.keyPair.publicKey, signedPreKeyRecord.signature, identityKey)
             }
         }

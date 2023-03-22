@@ -1,4 +1,4 @@
-package com.walnit.knockknock
+package com.example.knockknock
 //
 //import android.content.SharedPreferences
 //import android.os.Bundle
@@ -15,15 +15,15 @@ package com.walnit.knockknock
 //import com.example.knockknock.databinding.ActivityMainBinding
 //import com.google.android.material.button.MaterialButton
 //import com.google.android.material.textfield.TextInputEditText
-//import com.walnit.knockknock.networking.GetBundle
-//import com.walnit.knockknock.networking.GetMessagesForClient
-//import com.walnit.knockknock.networking.SendBundle
-//import com.walnit.knockknock.networking.SendMessagesToClient
-//import com.walnit.knockknock.signal.KnockIdentityKeyStore
-//import com.walnit.knockknock.signal.KnockPreKeyStore
-//import com.walnit.knockknock.signal.KnockSignedPreKeyStore
-//import com.walnit.knockknock.structures.KnockClient
-//import com.walnit.knockknock.structures.KnockClientSerializable
+//import com.example.knockknock.networking.GetBundle
+//import com.example.knockknock.networking.GetMessagesForClient
+//import com.example.knockknock.networking.SendBundle
+//import com.example.knockknock.networking.SendMessagesToClient
+//import com.example.knockknock.signal.KnockIdentityKeyStore
+//import com.example.knockknock.signal.KnockPreKeyStore
+//import com.example.knockknock.signal.KnockSignedPreKeyStore
+//import com.example.knockknock.structures.KnockClient
+//import com.example.knockknock.structures.KnockClientSerializable
 //import kotlinx.serialization.decodeFromString
 //import kotlinx.serialization.encodeToString
 //import kotlinx.serialization.json.Json

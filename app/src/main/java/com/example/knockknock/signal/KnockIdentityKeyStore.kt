@@ -1,4 +1,4 @@
-package com.walnit.knockknock.signal
+package com.example.knockknock.signal
 
 import android.content.Context
 import android.util.Base64
@@ -9,6 +9,7 @@ import org.whispersystems.libsignal.IdentityKeyPair
 import org.whispersystems.libsignal.SignalProtocolAddress
 import org.whispersystems.libsignal.state.IdentityKeyStore
 
+@Suppress("unused")
 class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
 
     // Get Identity Key store
