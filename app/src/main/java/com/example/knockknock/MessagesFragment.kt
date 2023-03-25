@@ -15,6 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.structures.KnockMessage
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.nio.charset.StandardCharsets
 
 class MessagesFragment : Fragment() {
@@ -24,12 +29,8 @@ class MessagesFragment : Fragment() {
 
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
 
         val target = requireArguments().getString("name")
-
-        toolbar.setupWithNavController(navController, appBarConfiguration)
-        toolbar.title = target
 
         if (target != null) {
 
@@ -45,11 +46,16 @@ class MessagesFragment : Fragment() {
             view.findViewById<ImageButton>(R.id.messages_send_imgbtn).setOnClickListener {
                 val editText = view.findViewById<TextInputEditText>(R.id.messages_edittext)
                 if (!editText.text.isNullOrBlank()) {
-                    MessageDatabase.writeMessages(target, arrayOf(KnockMessage(target,
-                        System.currentTimeMillis(), editText.text.toString().toByteArray(StandardCharsets.UTF_8), KnockMessage.KnockMessageType.TEXT)), requireContext())
+                    CoroutineScope(IO).launch {
+                        MessageDatabase.writeMessages(target, arrayOf(KnockMessage(target,
+                            System.currentTimeMillis(), editText.text.toString().toByteArray(StandardCharsets.UTF_8), KnockMessage.KnockMessageType.TEXT)), requireContext())
+                        val newAdapter = MessageDatabase.getMessages(target, requireContext())
+                            ?.let { MessagesRecyclerAdapter(it) }
+                        withContext(Main) {
+                            recyclerView.adapter = newAdapter
+                        }
+                    }
                     editText.text!!.clear()
-                    recyclerView.adapter = MessageDatabase.getMessages(target, requireContext())
-                        ?.let { MessagesRecyclerAdapter(it) }
                 }
             }
         }

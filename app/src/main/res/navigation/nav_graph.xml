@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/ChatsList"
         android:name="com.example.knockknock.ChatsListFragment"
-        android:label="Chats List"
+        android:label="Knock Knock!"
         tools:layout="@layout/fragment_chatslist">
 
         <action
