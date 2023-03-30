@@ -2,6 +2,7 @@ package com.example.knockknock
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.knockknock.onboarding.*
@@ -13,6 +14,9 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var indicator: CircleIndicator3
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback {
+            finishAffinity()
+        }
         setContentView(R.layout.activity_onboarding)
         castView()
         fragmentList.add(Page1())
@@ -25,4 +29,5 @@ class OnboardingActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.view_pager2)
         indicator = findViewById(R.id.indicator)
     }
+
 }

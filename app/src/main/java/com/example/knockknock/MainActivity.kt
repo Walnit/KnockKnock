@@ -1,8 +1,14 @@
 package com.example.knockknock
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,17 +19,28 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.knockknock.databinding.ActivityMainBinding
+import com.example.knockknock.signal.KnockPreKeyStore
+import com.example.knockknock.signal.KnockSignedPreKeyStore
 import com.google.android.material.navigation.NavigationView
+import org.whispersystems.libsignal.util.KeyHelper
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         if (sharedPreferences.getBoolean("isFirstTime", true)) {
-            startActivity(Intent(this, OnboardingActivity::class.java))
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
+
+
+            }.launch(Intent(this, OnboardingActivity::class.java))
+
         }
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

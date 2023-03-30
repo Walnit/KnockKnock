@@ -46,9 +46,14 @@ class MessagesFragment : Fragment() {
             view.findViewById<ImageButton>(R.id.messages_send_imgbtn).setOnClickListener {
                 val editText = view.findViewById<TextInputEditText>(R.id.messages_edittext)
                 if (!editText.text.isNullOrBlank()) {
+                    val editTextContent : String = editText.text.toString()
                     CoroutineScope(IO).launch {
-                        MessageDatabase.writeMessages(target, arrayOf(KnockMessage(target,
-                            System.currentTimeMillis(), editText.text.toString().toByteArray(StandardCharsets.UTF_8), KnockMessage.KnockMessageType.TEXT)), requireContext())
+                        MessageDatabase.writeMessages(target, arrayOf(KnockMessage(
+                            target,
+                            System.currentTimeMillis(),
+                            editTextContent.toByteArray(StandardCharsets.UTF_8),
+                            KnockMessage.KnockMessageType.TEXT
+                        )), requireContext())
                         val newAdapter = MessageDatabase.getMessages(target, requireContext())
                             ?.let { MessagesRecyclerAdapter(it) }
                         withContext(Main) {
