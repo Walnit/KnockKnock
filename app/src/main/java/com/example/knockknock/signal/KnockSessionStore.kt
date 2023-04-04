@@ -31,7 +31,7 @@ class KnockSessionStore(context: Context) : SessionStore {
             }
         }
 
-        return sessionRecord ?: SessionRecord(SessionState(StorageProtos.SessionStructure.getDefaultInstance()))
+        return sessionRecord ?: SessionRecord()
 
     }
 

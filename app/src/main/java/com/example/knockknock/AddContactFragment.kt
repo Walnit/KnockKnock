@@ -1,4 +1,4 @@
-package com.example.knockknock.onboarding
+package com.example.knockknock
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Base64
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -16,39 +17,48 @@ import android.widget.Button
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getDrawableOrThrow
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.example.knockknock.R
 import com.example.knockknock.networking.GetUsernameExists
-import com.example.knockknock.networking.SendAddUser
+import com.example.knockknock.networking.SendKnockRequest
 import com.example.knockknock.networking.ServerProperties
-import com.example.knockknock.networking.structures.AddUserRequest
+import com.example.knockknock.networking.structures.AddContactRequest
 import com.example.knockknock.networking.structures.UserExistsRequest
-import com.example.knockknock.signal.KnockPreKeyStore
-import com.example.knockknock.signal.KnockSignedPreKeyStore
+import com.example.knockknock.signal.KnockIdentityKeyStore
+import com.example.knockknock.structures.KnockClient
+import com.example.knockknock.structures.KnockClientSerializable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
-import org.whispersystems.libsignal.util.KeyHelper
+import org.whispersystems.libsignal.ecc.Curve
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import java.net.ConnectException
+import java.nio.charset.StandardCharsets
 
-class Page2 : Fragment() {
+class AddContactFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.onboarding_pg2_username, container, false)
+    ): View {
+        val view: View = inflater.inflate(R.layout.fragment_add_contact, container, false)
+
+        val navController = findNavController()
 
         with(view) {
-            val textInputLayout = findViewById<TextInputLayout>(R.id.ob_pg2_textlayout)
-            val textInputEditText = findViewById<TextInputEditText>(R.id.ob_pg2_edittext)
-            val continueButton = findViewById<Button>(R.id.ob_pg2_continue_btn)
+            val textInputLayout = findViewById<TextInputLayout>(R.id.add_contact_layout)
+            val textInputEditText = findViewById<TextInputEditText>(R.id.add_contact_edittext)
+            val knockButton = findViewById<Button>(R.id.add_contact_knock_btn)
             val retrofit = ServerProperties.getRetrofitInstance()
 
             val states =
@@ -56,10 +66,7 @@ class Page2 : Fragment() {
 
             var currentUsernameCheckCoroutine: Job? = null
 
-            continueButton.setOnClickListener {
-                // Signal magic below
-
-                val username: String = textInputEditText.text.toString()
+            knockButton.setOnClickListener {
 
                 val masterKey = MasterKey.Builder(requireContext())
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
@@ -71,56 +78,68 @@ class Page2 : Fragment() {
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                 )
-                // Generate required information
 
-                val identityKeyPair = KeyHelper.generateIdentityKeyPair()
-                val registrationId = KeyHelper.generateRegistrationId(false)
-                val preKeys = KeyHelper.generatePreKeys(1, 100)
-                val signedPreKey = KeyHelper.generateSignedPreKey(identityKeyPair, 1)
-
-                val call: Call<ResponseBody> = retrofit.create(SendAddUser::class.java).addUser(
-                    AddUserRequest(
-                        textInputLayout.editText?.text.toString(),
-                        Base64.encodeToString(
-                            identityKeyPair.publicKey.publicKey.serialize(),
-                            Base64.NO_WRAP
+                val target: String = textInputLayout.editText?.text.toString()
+                val call: Call<ResponseBody> =
+                    retrofit.create(SendKnockRequest::class.java).addContact(
+                        AddContactRequest(
+                            securePreferences.getString("name", null)!!,
+                            target,
+                            Base64.encodeToString(
+                                Json.encodeToString(
+                                    KnockIdentityKeyStore(requireContext())
+                                        .getLocalKnockClient().toSerializableClient()
+                                ).toByteArray(), Base64.NO_WRAP
+                            ),
+                            Base64.encodeToString(
+                                Curve.calculateSignature(
+                                    KnockIdentityKeyStore(requireContext()).identityKeyPair.privateKey,
+                                    target.toByteArray(StandardCharsets.UTF_8)
+                                ), Base64.NO_WRAP
+                            )
                         )
                     )
-                )
                 try {
                     CoroutineScope(Dispatchers.IO).launch {
                         val result = call.execute()
-                        if (result.code() == 200) {
+                        if (result.code() == 201) {
                             withContext(Dispatchers.Main) {
-
-                                // Save required information to secure preferences
-                                securePreferences.edit()
-                                    .putString(
-                                        "IKP",
-                                        Base64.encodeToString(identityKeyPair.serialize(), Base64.NO_WRAP)
-                                    )
-                                    .putInt("RID", registrationId)
-                                    .putString("name", username)
-                                    .apply() // Store IdentityKeyPair and RegistrationID
-
-                                val preKeyStore = KnockPreKeyStore(requireContext())
-                                preKeyStore.setMaxPreKeyID(100)
-                                preKeys.forEach { preKey ->
-                                    preKeyStore.storePreKey(preKey.id, preKey)
-                                } // Store PreKeys
-
-                                KnockSignedPreKeyStore(requireContext()).storeSignedPreKey(
-                                    signedPreKey.id,
-                                    signedPreKey
-                                )
-
-                                requireActivity().finish()
+                                Snackbar.make(
+                                    textInputLayout,
+                                    "Request Sent!",
+                                    Snackbar.LENGTH_LONG
+                                ).show()
                             }
+                        } else if (result.code() == 202) {
+
+                            val masterKey = MasterKey.Builder(requireContext())
+                                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
+
+                            var secureContacts = EncryptedSharedPreferences.create(
+                                requireContext(),
+                                "secure_contacts",
+                                masterKey,
+                                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                            )
+
+                            val rawJson = String(Base64.decode(result.body()?.string(), Base64.NO_WRAP))
+                            val targetClient = KnockClient.fromSerialized(
+                                Json.decodeFromString<KnockClientSerializable>(rawJson)
+                            )
+
+                            secureContacts.edit().putString(targetClient.name, rawJson).commit()
+
+                            withContext(Dispatchers.Main) {
+                                val bundle = bundleOf("name" to targetClient.name)
+                                navController.navigate(R.id.action_addContactFragment_to_messagesFragment, bundle)
+                            }
+
                         } else if (result.code() == 403) {
                             withContext(Dispatchers.Main) {
                                 Snackbar.make(
                                     textInputLayout,
-                                    "Oops, someone was faster than you and choped that name",
+                                    "Authentication Error",
                                     Snackbar.LENGTH_LONG
                                 ).show()
                             }
@@ -155,7 +174,7 @@ class Page2 : Fragment() {
 
                     // Reset states of indeterminate things
                     currentUsernameCheckCoroutine?.cancel()
-                    continueButton.isEnabled = false
+                    knockButton.isEnabled = false
                     textInputLayout.error = ""
 
                     textInputLayout.endIconMode = TextInputLayout.END_ICON_CUSTOM
@@ -174,7 +193,7 @@ class Page2 : Fragment() {
                             if (result.code() == 200) {
                                 val resultString = result.body()?.string()
                                 if (resultString != null) {
-                                    if (resultString == "false") {
+                                    if (resultString == "true") {
                                         withContext(Dispatchers.Main) {
                                             textInputLayout.endIconMode =
                                                 TextInputLayout.END_ICON_CUSTOM
@@ -183,13 +202,13 @@ class Page2 : Fragment() {
                                                     context,
                                                     R.drawable.baseline_check_circle_24
                                                 )
-                                            continueButton.isEnabled = true
+                                            knockButton.isEnabled = true
                                         }
                                     } else {
                                         withContext(Dispatchers.Main) {
                                             textInputLayout.endIconMode =
                                                 TextInputLayout.END_ICON_NONE
-                                            textInputLayout.error = "Username Taken"
+                                            textInputLayout.error = "Username doesn't exist"
                                         }
                                     }
                                 }
@@ -204,8 +223,14 @@ class Page2 : Fragment() {
                                 textInputLayout.endIconMode = TextInputLayout.END_ICON_NONE
                                 textInputLayout.error = "Network Error"
                             }
+                        } catch (e: IOException) {
+                        withContext(Dispatchers.Main) {
+                            e.printStackTrace()
+                            textInputLayout.endIconMode = TextInputLayout.END_ICON_NONE
+                            textInputLayout.error = "Network Error"
                         }
                     }
+                }
                 }
             })
         }

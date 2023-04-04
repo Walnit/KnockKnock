@@ -36,11 +36,19 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         if (sharedPreferences.getBoolean("isFirstTime", true)) {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
-
-
+                var securePreferences = EncryptedSharedPreferences.create(
+                    this,
+                    "secure_prefs",
+                    MasterKey.Builder(this)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+                if (securePreferences.contains("name")) sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
             }.launch(Intent(this, OnboardingActivity::class.java))
 
+        } else {
+            startService(Intent(this, MessageSyncService::class.java))
         }
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

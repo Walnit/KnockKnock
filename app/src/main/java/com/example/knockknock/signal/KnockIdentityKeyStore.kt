@@ -4,13 +4,14 @@ import android.content.Context
 import android.util.Base64
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.knockknock.structures.KnockClient
 import org.whispersystems.libsignal.IdentityKey
 import org.whispersystems.libsignal.IdentityKeyPair
 import org.whispersystems.libsignal.SignalProtocolAddress
 import org.whispersystems.libsignal.state.IdentityKeyStore
 
 @Suppress("unused")
-class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
+class KnockIdentityKeyStore(val context: Context) : IdentityKeyStore {
 
     // Get Identity Key store
     private val secureIdentityKeyStore = EncryptedSharedPreferences.create(
@@ -29,8 +30,14 @@ class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
+
     override fun getIdentityKeyPair(): IdentityKeyPair {
-        return IdentityKeyPair(Base64.decode(securePreferences.getString("IKP", null), Base64.NO_WRAP))
+        return IdentityKeyPair(
+            Base64.decode(
+                securePreferences.getString("IKP", null),
+                Base64.NO_WRAP
+            )
+        )
     }
 
     override fun getLocalRegistrationId(): Int {
@@ -39,13 +46,18 @@ class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
 
     override fun saveIdentity(address: SignalProtocolAddress?, identityKey: IdentityKey?): Boolean {
         if (address != null) {
-            val isReplacingPreviousKey = secureIdentityKeyStore.contains(address.name+","+address.deviceId.toString())
+            val isReplacingPreviousKey =
+                secureIdentityKeyStore.contains(address.name + "," + address.deviceId.toString())
             if (identityKey != null) {
                 secureIdentityKeyStore.edit()
-                    .putString(address.name+","+address.deviceId.toString(), Base64.encodeToString(identityKey.serialize(), Base64.NO_WRAP))
+                    .putString(
+                        address.name + "," + address.deviceId.toString(),
+                        Base64.encodeToString(identityKey.serialize(), Base64.NO_WRAP)
+                    )
                     .apply()
             } else {
-                secureIdentityKeyStore.edit().remove(address.name+","+address.deviceId.toString()).apply()
+                secureIdentityKeyStore.edit()
+                    .remove(address.name + "," + address.deviceId.toString()).apply()
             }
             return isReplacingPreviousKey
         }
@@ -58,7 +70,7 @@ class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
         direction: IdentityKeyStore.Direction?
     ): Boolean {
         if (address != null) {
-            if (!secureIdentityKeyStore.contains(address.name+","+address.deviceId.toString())) return true
+            if (!secureIdentityKeyStore.contains(address.name + "," + address.deviceId.toString())) return true
             else {
                 if (identityKey != null) {
                     if (getIdentity(address)?.fingerprint == identityKey.fingerprint) {
@@ -72,9 +84,23 @@ class KnockIdentityKeyStore(context: Context) : IdentityKeyStore {
 
     override fun getIdentity(address: SignalProtocolAddress?): IdentityKey? {
         if (address != null) {
-            return IdentityKey(Base64.decode(
-                secureIdentityKeyStore.getString(address.name+","+address.deviceId.toString(), null), Base64.NO_WRAP),0)
+            return IdentityKey(
+                Base64.decode(
+                    secureIdentityKeyStore.getString(
+                        address.name + "," + address.deviceId.toString(),
+                        null
+                    ), Base64.NO_WRAP
+                ), 0
+            )
         }
         return null
+    }
+
+    fun getLocalKnockClient(): KnockClient {
+        return KnockClient.newClient(
+            context, securePreferences.getString("name", null)!!,
+            localRegistrationId, 1, KnockSignedPreKeyStore(context).loadSignedPreKeys()[0],
+            identityKeyPair.publicKey
+        )
     }
 }

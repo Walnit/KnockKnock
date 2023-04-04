@@ -11,6 +11,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ChatsListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -18,6 +19,10 @@ class ChatsListFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_chatslist, container, false )
 
         val navController = findNavController()
+
+        view.findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+            navController.navigate(R.id.action_ChatsList_to_addContactFragment)
+        }
 
         // Populate RecyclerView
         val recyclerView = view.findViewById<RecyclerView>(R.id.chatslist_recyclerview)

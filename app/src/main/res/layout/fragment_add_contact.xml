@@ -9,46 +9,46 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter a username:"
+        android:text="What's their unit?"
         android:textAlignment="center"
         android:textColor="?attr/colorPrimary"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/ob_pg2_textlayout"
+        app:layout_constraintBottom_toTopOf="@+id/add_contact_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ob_pg2_textlayout"
+        android:id="@+id/add_contact_layout"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:hint="Username"
-        app:layout_constraintBottom_toTopOf="@+id/ob_pg2_continue_btn"
+        app:layout_constraintBottom_toTopOf="@+id/add_contact_knock_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/ob_pg2_edittext"
+            android:id="@+id/add_contact_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/ob_pg2_continue_btn"
+        android:id="@+id/add_contact_knock_btn"
         style="@style/m3_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
-        android:text="Continue"
-        app:icon="@drawable/baseline_arrow_right_alt_24"
+        android:text="Knock Knock!"
+        app:icon="@drawable/baseline_waving_hand_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ob_pg2_textlayout" />
+        app:layout_constraintTop_toBottomOf="@+id/add_contact_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

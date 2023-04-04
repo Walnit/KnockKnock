@@ -1,6 +1,7 @@
 package com.example.knockknock.database
 
 import android.content.Context
+import android.util.Log
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -16,18 +17,12 @@ import java.util.*
 
 object MessageDatabase {
 
-    private var messagesArray: Array<KnockMessage> = arrayOf()
-    private var currentTarget: String? = null
+    var messagesMap: MutableMap<String, Array<KnockMessage>> = mutableMapOf()
 
     fun getMessages(name: String, context: Context) : Array<KnockMessage>? {
-
-        if (name == currentTarget && messagesArray.isNotEmpty()) {
-            return messagesArray
-        } else {
-
-            currentTarget = name
-            messagesArray = arrayOf()
-
+        if (messagesMap.containsKey(name)) return messagesMap.get(name)
+        else {
+            // No cache, read from disk
             val masterKey =
                 MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
             val securePreferences = EncryptedSharedPreferences.create(
@@ -40,8 +35,8 @@ object MessageDatabase {
 
             // Get the correct file to read
             val fileToRead = securePreferences.getString(name, null)
-
             if (fileToRead != null) {
+                // File exists aka there is previous chat history
                 val encryptedFile = EncryptedFile.Builder(
                     context,
                     File(context.filesDir, fileToRead),
@@ -60,24 +55,41 @@ object MessageDatabase {
                         nextByte = inputStream.read()
                     }
 
-                    stringJSONArray = JSONArray(String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8))
+                    stringJSONArray = JSONArray(
+                        String(
+                            byteArrayOutputStream.toByteArray(),
+                            StandardCharsets.UTF_8
+                        )
+                    )
                 }
+
+                var tmpArray: Array<KnockMessage> = arrayOf()
 
                 for (i in 0 until stringJSONArray.length()) {
-                    messagesArray = messagesArray.plus(Json.decodeFromString<KnockMessage>(stringJSONArray.getString(i)))
+                    tmpArray = tmpArray.plus(
+                        Json.decodeFromString<KnockMessage>(
+                            stringJSONArray.getString(i)
+                        )
+                    )
 
                 }
 
-                return messagesArray
+                messagesMap[name] = tmpArray
+
+                return tmpArray
 
             } else {
+                // no previous chat history with name
                 return null
             }
         }
-
     }
 
     fun writeMessages(name: String, messages: Array<KnockMessage>, context: Context) {
+
+        if (messagesMap.containsKey(name)) {
+            messagesMap[name] = messagesMap[name]!!.plus(messages)
+        }
 
         val masterKey =
             MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
@@ -117,17 +129,9 @@ object MessageDatabase {
             existingStringMessages = JSONArray(String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8))
         }
 
-        if (name == currentTarget) {
-            messages.forEach { message ->
-                messagesArray = messagesArray.plus(message)
-                existingStringMessages.put(Json.encodeToString(message))
-            }
-        } else {
-            messages.forEach { message ->
-                existingStringMessages.put(Json.encodeToString(message))
-            }
+        messages.forEach { message ->
+            existingStringMessages.put(Json.encodeToString(message))
         }
-
 
         // Write new messages to disk
 

@@ -1,26 +1,34 @@
 package com.example.knockknock
 
+import android.content.Context
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.structures.KnockMessage
+import org.whispersystems.libsignal.SessionCipher
+import org.whispersystems.libsignal.protocol.PreKeySignalMessage
 import java.nio.charset.StandardCharsets
 
-class MessagesRecyclerAdapter(private val messageList: Array<KnockMessage>): RecyclerView.Adapter<MessagesRecyclerAdapter.ViewHolder>() {
+class MessagesRecyclerAdapter(private val target: String, private val context: Context, private val sessionCipher : SessionCipher): RecyclerView.Adapter<MessagesRecyclerAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val v : View = LayoutInflater.from(parent.context)
                 .inflate(R.layout.card_messages,parent,false)
-            return ViewHolder(v)
+            return ViewHolder(v, sessionCipher)
         }
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bindItems(messageList[position])
+            holder.bindItems(MessageDatabase.getMessages(target, context)!![position])
         }
-        override fun getItemCount() = messageList.size
+        override fun getItemCount(): Int {
+            val messages = MessageDatabase.getMessages(target, context)
+            return messages?.size ?: 0
+        }
 
-        class ViewHolder(msgView: View) : RecyclerView.ViewHolder(msgView) {
+        class ViewHolder(msgView: View, val sessionCipher: SessionCipher) : RecyclerView.ViewHolder(msgView) {
             private var msgSender : TextView
             private var msgText : TextView
 
@@ -30,7 +38,7 @@ class MessagesRecyclerAdapter(private val messageList: Array<KnockMessage>): Rec
             }
             fun bindItems(msg : KnockMessage){
                 msgSender.text = msg.sender
-                msgText.text = String(msg.content, StandardCharsets.UTF_8)
+                msgText.text = String(sessionCipher.decrypt(PreKeySignalMessage(msg.content)), StandardCharsets.UTF_8)
             }
 
         }
