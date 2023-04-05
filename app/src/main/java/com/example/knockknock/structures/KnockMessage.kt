@@ -8,7 +8,7 @@ data class KnockMessage (
     val type: KnockMessageType
 ) {
     enum class KnockMessageType {
-        TEXT
+        TEXT, PREKEY
     }
 
     override fun equals(other: Any?): Boolean {

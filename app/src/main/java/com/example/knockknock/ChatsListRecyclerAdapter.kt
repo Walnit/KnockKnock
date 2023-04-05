@@ -12,7 +12,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
 @Suppress("unused", "unused", "unused", "unused", "unused")
-class ChatsListRecyclerAdapter(private val chats: ArrayList<String>) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
+class ChatsListRecyclerAdapter(private val chats: Array<String>) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v : View = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_chatslist,parent,false)

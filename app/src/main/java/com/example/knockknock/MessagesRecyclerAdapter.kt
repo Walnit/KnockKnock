@@ -9,8 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.structures.KnockMessage
+import com.google.protobuf.InvalidProtocolBufferException
 import org.whispersystems.libsignal.SessionCipher
 import org.whispersystems.libsignal.protocol.PreKeySignalMessage
+import org.whispersystems.libsignal.protocol.SignalMessage
+import java.lang.reflect.InvocationTargetException
 import java.nio.charset.StandardCharsets
 
 class MessagesRecyclerAdapter(private val target: String, private val context: Context, private val sessionCipher : SessionCipher): RecyclerView.Adapter<MessagesRecyclerAdapter.ViewHolder>() {
@@ -38,7 +41,11 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
             }
             fun bindItems(msg : KnockMessage){
                 msgSender.text = msg.sender
-                msgText.text = String(sessionCipher.decrypt(PreKeySignalMessage(msg.content)), StandardCharsets.UTF_8)
+
+                if (msg.type == KnockMessage.KnockMessageType.TEXT) {
+                    msgText.text = String(msg.content, StandardCharsets.UTF_8)
+                }
+
             }
 
         }

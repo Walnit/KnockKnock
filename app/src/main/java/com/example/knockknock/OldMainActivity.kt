@@ -19,7 +19,7 @@ package com.example.knockknock
 //import com.example.knockknock.networking.GetMessagesForClient
 //import com.example.knockknock.networking.SendBundle
 //import com.example.knockknock.networking.SendMessagesToClient
-//import com.example.knockknock.signal.KnockIdentityKeyStore
+//import com.example.knockknock.signal.KnockSignalProtocolStore
 //import com.example.knockknock.signal.KnockPreKeyStore
 //import com.example.knockknock.signal.KnockSignedPreKeyStore
 //import com.example.knockknock.structures.KnockClient

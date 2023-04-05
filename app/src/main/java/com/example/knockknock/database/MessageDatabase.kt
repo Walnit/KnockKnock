@@ -146,4 +146,24 @@ object MessageDatabase {
         }
 
     }
+
+    fun clearMessages(name: String, context: Context) {
+        if (messagesMap.containsKey(name)) {
+            messagesMap.remove(name)
+        }
+
+        val securePreferences = EncryptedSharedPreferences.create(
+            context,
+            "db_secure",
+            MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        // Get correct file to write
+        var fileToRead = securePreferences.getString(name, null)
+        if (fileToRead != null) {
+            File(context.filesDir, fileToRead).delete()
+        }
+    }
 }

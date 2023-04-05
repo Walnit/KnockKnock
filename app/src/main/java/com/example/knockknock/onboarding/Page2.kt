@@ -25,8 +25,7 @@ import com.example.knockknock.networking.SendAddUser
 import com.example.knockknock.networking.ServerProperties
 import com.example.knockknock.networking.structures.AddUserRequest
 import com.example.knockknock.networking.structures.UserExistsRequest
-import com.example.knockknock.signal.KnockPreKeyStore
-import com.example.knockknock.signal.KnockSignedPreKeyStore
+import com.example.knockknock.signal.KnockSignalProtocolStore
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -101,15 +100,15 @@ class Page2 : Fragment() {
                                     )
                                     .putInt("RID", registrationId)
                                     .putString("name", username)
-                                    .apply() // Store IdentityKeyPair and RegistrationID
+                                    .commit() // Store IdentityKeyPair and RegistrationID
 
-                                val preKeyStore = KnockPreKeyStore(requireContext())
-                                preKeyStore.setMaxPreKeyID(100)
+                                val store = KnockSignalProtocolStore(requireContext())
+                                store.setMaxPreKeyID(100)
                                 preKeys.forEach { preKey ->
-                                    preKeyStore.storePreKey(preKey.id, preKey)
+                                    store.storePreKey(preKey.id, preKey)
                                 } // Store PreKeys
 
-                                KnockSignedPreKeyStore(requireContext()).storeSignedPreKey(
+                                store.storeSignedPreKey(
                                     signedPreKey.id,
                                     signedPreKey
                                 )

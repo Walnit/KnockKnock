@@ -22,8 +22,6 @@ import androidx.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.knockknock.databinding.ActivityMainBinding
-import com.example.knockknock.signal.KnockPreKeyStore
-import com.example.knockknock.signal.KnockSignedPreKeyStore
 import com.google.android.material.navigation.NavigationView
 import org.whispersystems.libsignal.util.KeyHelper
 
@@ -44,7 +42,10 @@ class MainActivity : AppCompatActivity() {
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                 )
-                if (securePreferences.contains("name")) sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
+                if (securePreferences.contains("name")) {
+                    sharedPreferences.edit().putBoolean("isFirstTime", false).commit()
+                    startService(Intent(this, MessageSyncService::class.java))
+                }
             }.launch(Intent(this, OnboardingActivity::class.java))
 
         } else {
@@ -67,6 +68,8 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     toolbar.title = "Messages"
                 }
+            } else if (destination.id == R.id.addContactFragment) {
+                toolbar.title = "Add Contact"
             }
         }
 

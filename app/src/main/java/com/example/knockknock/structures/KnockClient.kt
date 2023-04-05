@@ -1,7 +1,7 @@
 package com.example.knockknock.structures
 
 import android.content.Context
-import com.example.knockknock.signal.KnockPreKeyStore
+import com.example.knockknock.signal.KnockSignalProtocolStore
 import org.whispersystems.libsignal.IdentityKey
 import org.whispersystems.libsignal.ecc.Curve
 import org.whispersystems.libsignal.ecc.ECPublicKey
@@ -24,9 +24,9 @@ class KnockClient(
     companion object {
         fun newClient(context: Context, name: String, registrationID: Int, deviceID: Int, signedPreKeyRecord: SignedPreKeyRecord, identityKey: IdentityKey, preKeyRecord: PreKeyRecord? = null) : KnockClient {
             return if (preKeyRecord == null) {
-                val preKeyStore = KnockPreKeyStore(context)
-                val preKeyID = preKeyStore.getNewPreKeyID()
-                KnockClient(name, registrationID, deviceID, preKeyID, preKeyStore.loadPreKey(preKeyID).keyPair.publicKey,
+                val store = KnockSignalProtocolStore(context)
+                val preKeyID = store.getNewPreKeyID()
+                KnockClient(name, registrationID, deviceID, preKeyID, store.loadPreKey(preKeyID).keyPair.publicKey,
                     signedPreKeyRecord.id, signedPreKeyRecord.keyPair.publicKey, signedPreKeyRecord.signature, identityKey)
             } else {
                 KnockClient(name, registrationID, deviceID, preKeyRecord.id, preKeyRecord.keyPair.publicKey,
