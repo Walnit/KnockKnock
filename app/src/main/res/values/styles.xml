@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="m3_button">
+    <style name="m3_button"
+        parent="@style/Widget.Material3.Button">
 <!--        parent="@style/Widget.Material3.Button.IconButton.Filled">-->
-<!--        <item name="android:textSize">14sp</item>-->
+        <item name="android:textAppearance">@style/TextAppearance.Material3.LabelLarge</item>
 <!--        <item name="android:paddingLeft">14dp</item>-->
 <!--        <item name="android:paddingRight">18dp</item>-->
 <!--        <item name="iconPadding">8dp</item>-->

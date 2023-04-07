@@ -25,6 +25,7 @@ import com.example.knockknock.signal.*
 import com.example.knockknock.structures.KnockClient
 import com.example.knockknock.structures.KnockClientSerializable
 import com.example.knockknock.structures.KnockMessage
+import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.*
@@ -51,7 +52,6 @@ class MessagesFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_messages, container, false)
 
         val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
 
         val target = requireArguments().getString("name")
 
@@ -62,26 +62,12 @@ class MessagesFragment : Fragment() {
 
             // Signal magic as well
 
-            val masterKey = MasterKey.Builder(requireContext())
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
+            val prefsHelper = PrefsHelper(requireContext())
+            var securePreferences = prefsHelper.openEncryptedPrefs("secure_prefs")
+            val secureContacts = prefsHelper.openEncryptedPrefs("secure_contacts")
+            val hiddenContacts = prefsHelper.openEncryptedPrefs("hidden_contacts")
 
-            var securePreferences = EncryptedSharedPreferences.create(
-                requireContext(),
-                "secure_prefs",
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-
-            val secureContacts = EncryptedSharedPreferences.create(
-                requireContext(),
-                "secure_contacts",
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-
-            if (!secureContacts.contains(target)) {
+            if (!secureContacts.contains(target) && !hiddenContacts.all.values.contains(target)) {
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("Error!")
                 builder.setMessage("You have not requested to contact this user!")
@@ -186,15 +172,19 @@ class MessagesFragment : Fragment() {
 
                 // Refresh views to get new messages
 
+                var lastMessage: Int = 0
+
                 msgSyncJob = CoroutineScope(IO).launch {
                     while (true) {
+                        val adapter = recyclerView.adapter as MessagesRecyclerAdapter
                         withContext(Main) {
-                            (recyclerView.adapter as MessagesRecyclerAdapter).notifyItemRangeChanged(0, (recyclerView.adapter as MessagesRecyclerAdapter).itemCount)
-
+                            adapter.notifyItemRangeChanged(lastMessage, (recyclerView.adapter as MessagesRecyclerAdapter).itemCount)
+                            lastMessage = adapter.itemCount
                         }
                         delay(100)
                     }
                 }
+
             }
         }
 

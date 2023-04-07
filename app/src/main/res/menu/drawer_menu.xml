@@ -12,6 +12,10 @@
             android:id="@+id/addContactFragment"
             android:icon="@drawable/baseline_waving_hand_24"
             android:title="Add Contact"/>
+        <item
+            android:id="@+id/knockCodeFragment"
+            android:icon="@drawable/baseline_grid_3x3_24"
+            android:title="Hidden Contacts"/>
 
     </group>
 </menu>

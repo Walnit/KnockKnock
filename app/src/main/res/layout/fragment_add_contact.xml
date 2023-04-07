@@ -116,7 +116,7 @@
                     app:layout_constraintStart_toEndOf="@+id/imageView"
                     app:layout_constraintTop_toTopOf="@+id/imageView" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/add_contact_knock_btn"
                     style="@style/m3_button"
                     android:layout_width="wrap_content"

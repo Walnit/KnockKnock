@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_ChatsList_to_addContactFragment"
             app:destination="@id/addContactFragment" />
+        <action
+            android:id="@+id/action_ChatsList_to_knockCodeFragment"
+            app:destination="@id/knockCodeFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -41,6 +44,9 @@
             android:name="name"
             app:argType="string"
             android:defaultValue="janjan" />
+        <action
+            android:id="@+id/action_messagesFragment_to_hideContactFragment"
+            app:destination="@id/hideContactFragment" />
     </fragment>
     <fragment
         android:id="@+id/addContactFragment"
@@ -51,6 +57,24 @@
             app:destination="@id/messagesFragment" />
         <action
             android:id="@+id/action_addContactFragment_to_ChatsList"
+            app:destination="@id/ChatsList" />
+    </fragment>
+    <fragment
+        android:id="@+id/knockCodeFragment"
+        android:name="com.example.knockknock.KnockCodeFragment"
+        android:label="fragment_knock_code"
+        tools:layout="@layout/fragment_knock_code" >
+        <action
+            android:id="@+id/action_knockCodeFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/hideContactFragment"
+        android:name="com.example.knockknock.HideContactFragment"
+        android:label="fragment_hide_contact"
+        tools:layout="@layout/fragment_hide_contact" >
+        <action
+            android:id="@+id/action_hideContactFragment_to_ChatsList"
             app:destination="@id/ChatsList" />
     </fragment>
 </navigation>
