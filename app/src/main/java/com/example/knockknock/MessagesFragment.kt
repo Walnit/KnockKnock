@@ -7,9 +7,12 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -45,6 +48,7 @@ import java.nio.charset.StandardCharsets
 class MessagesFragment : Fragment() {
 
     lateinit var msgSyncJob: Job
+    lateinit var messageTarget: String
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,134 +61,162 @@ class MessagesFragment : Fragment() {
 
         if (target != null) {
 
-            val recyclerView = view.findViewById<RecyclerView>(R.id.messages_recyclerview)
-            val retrofit = ServerProperties.getRetrofitInstance()
+            messageTarget = target
 
-            // Signal magic as well
+            CoroutineScope(IO).launch {
 
-            val prefsHelper = PrefsHelper(requireContext())
-            var securePreferences = prefsHelper.openEncryptedPrefs("secure_prefs")
-            val secureContacts = prefsHelper.openEncryptedPrefs("secure_contacts")
-            val hiddenContacts = prefsHelper.openEncryptedPrefs("hidden_contacts")
+                val recyclerView = view.findViewById<RecyclerView>(R.id.messages_recyclerview)
+                val progressBar = view.findViewById<ProgressBar>(R.id.messages_loading_progressbar)
+                val retrofit = ServerProperties.getRetrofitInstance()
 
-            if (!secureContacts.contains(target) && !hiddenContacts.all.values.contains(target)) {
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Error!")
-                builder.setMessage("You have not requested to contact this user!")
-                builder.setIcon(android.R.drawable.ic_dialog_alert)
-                builder.setPositiveButton("Ok") {_,_->}
-                builder.create().show()
+                // Signal magic as well
 
-                navController.navigate(R.id.action_messagesFragment_to_ChatsList)
+                val prefsHelper = PrefsHelper(requireContext())
+                var securePreferences = prefsHelper.openEncryptedPrefs("secure_prefs")
+                val secureContacts = prefsHelper.openEncryptedPrefs("secure_contacts")
+                val hiddenContacts = prefsHelper.openEncryptedPrefs("hidden_contacts")
 
-            } else {
+                if (!secureContacts.contains(target) && !hiddenContacts.all.values.contains(target)) {
+                    withContext(Dispatchers.Main) {
+                        val builder = AlertDialog.Builder(requireContext())
+                        builder.setTitle("Error!")
+                        builder.setMessage("You have not requested to contact this user!")
+                        builder.setIcon(android.R.drawable.ic_dialog_alert)
+                        builder.setPositiveButton("Ok") { _, _ -> }
+                        builder.create().show()
 
-                val store = KnockSignalProtocolStore(requireContext())
+                        navController.navigate(R.id.action_messagesFragment_to_ChatsList)
+                    }
+                } else {
 
-                val sessionCipher = SessionCipher(
-                    store,
-                    SignalProtocolAddress(target, 1)
-                )
+                    // Set pref so that no notifs and sounds for this guy
+                    securePreferences.edit().putString("current", target).apply()
 
-                val layoutManager = LinearLayoutManager(requireContext())
-                layoutManager.stackFromEnd = true
-                recyclerView.layoutManager = layoutManager
+                    val store = KnockSignalProtocolStore(requireContext())
 
-                recyclerView.adapter = MessagesRecyclerAdapter(target, requireContext(), sessionCipher)
+                    val sessionCipher = SessionCipher(
+                        store,
+                        SignalProtocolAddress(target, 1)
+                    )
 
-                view.findViewById<ImageButton>(R.id.messages_send_imgbtn).setOnClickListener {
-                    val editText = view.findViewById<TextInputEditText>(R.id.messages_edittext)
-                    if (!editText.text.isNullOrBlank()) {
-                        val editTextContent: String = editText.text.toString()
-                        CoroutineScope(IO).launch {
+                    withContext(Main) {
+                        val layoutManager = LinearLayoutManager(requireContext())
+                        layoutManager.stackFromEnd = true
+                        recyclerView.layoutManager = layoutManager
 
-                            val cipherMessage = sessionCipher.encrypt(
-                                    editTextContent.toByteArray(StandardCharsets.UTF_8)
-                                )
+                        recyclerView.adapter =
+                            MessagesRecyclerAdapter(target, requireContext())
 
-                            val messageType: String
-                            if (cipherMessage is PreKeySignalMessage) {
-                                messageType = "P"
-                                Log.i("TAG", "prekeymessage")
-                            } else if (cipherMessage is SignalMessage){
-                                messageType = "M"
-                                Log.i("TAG", "message")
-                            } else {
-                                messageType = "O"
-                            }
+                        view.findViewById<ImageButton>(R.id.messages_send_imgbtn).setOnClickListener {
+                            val editText = view.findViewById<TextInputEditText>(R.id.messages_edittext)
+                            if (!editText.text.isNullOrBlank()) {
+                                val editTextContent: String = editText.text.toString()
+                                CoroutineScope(IO).launch {
 
-                            val serMessage = (messageType + Base64.encodeToString(cipherMessage.serialize(), Base64.NO_WRAP)).toByteArray(StandardCharsets.UTF_8)
-
-                            val call = retrofit.create(SendMessage::class.java).sendMessage(
-                                SendMessageRequest(
-                                    securePreferences.getString("name", null)!!,
-                                    target,
-                                    Base64.encodeToString(serMessage, Base64.NO_WRAP),
-                                    Base64.encodeToString(
-                                        Curve.calculateSignature(
-                                            store.identityKeyPair.privateKey,
-                                            serMessage
-                                        ), Base64.NO_WRAP
+                                    val cipherMessage = sessionCipher.encrypt(
+                                        editTextContent.toByteArray(StandardCharsets.UTF_8)
                                     )
-                                )
-                            )
 
-                            try {
-                                val result = call.execute()
-                                if (result.code() == 200) {
-                                    MessageDatabase.writeMessages(
-                                        target, arrayOf(
-                                            KnockMessage(
-                                                store.getLocalKnockClient().name,
-                                                System.currentTimeMillis(),
-                                                editTextContent.toByteArray(StandardCharsets.UTF_8),
-                                                KnockMessage.KnockMessageType.TEXT
+                                    val messageType: String
+                                    if (cipherMessage is PreKeySignalMessage) {
+                                        messageType = "P"
+                                        Log.i("TAG", "prekeymessage")
+                                    } else if (cipherMessage is SignalMessage) {
+                                        messageType = "M"
+                                        Log.i("TAG", "message")
+                                    } else {
+                                        messageType = "O"
+                                    }
+
+                                    val serMessage = (messageType + Base64.encodeToString(
+                                        cipherMessage.serialize(),
+                                        Base64.NO_WRAP
+                                    )).toByteArray(StandardCharsets.UTF_8)
+
+                                    val call = retrofit.create(SendMessage::class.java).sendMessage(
+                                        SendMessageRequest(
+                                            securePreferences.getString("name", null)!!,
+                                            target,
+                                            Base64.encodeToString(serMessage, Base64.NO_WRAP),
+                                            Base64.encodeToString(
+                                                Curve.calculateSignature(
+                                                    store.identityKeyPair.privateKey,
+                                                    serMessage
+                                                ), Base64.NO_WRAP
                                             )
-                                        ), requireContext()
+                                        )
                                     )
 
-                                } else if (result.code() == 403) {
-                                    withContext(Dispatchers.Main) {
+                                    try {
+                                        val result = call.execute()
+                                        if (result.code() == 200) {
+                                            MessageDatabase.writeMessages(
+                                                target, arrayOf(
+                                                    KnockMessage(
+                                                        store.getLocalKnockClient().name,
+                                                        System.currentTimeMillis(),
+                                                        editTextContent.toByteArray(StandardCharsets.UTF_8),
+                                                        KnockMessage.KnockMessageType.TEXT
+                                                    )
+                                                ), requireContext()
+                                            )
+
+                                        } else if (result.code() == 403) {
+                                            withContext(Dispatchers.Main) {
+                                                Snackbar.make(
+                                                    recyclerView,
+                                                    "Authentication Error",
+                                                    Snackbar.LENGTH_LONG
+                                                ).show()
+                                            }
+                                        } else {
+                                            withContext(Dispatchers.Main) {
+                                                Snackbar.make(
+                                                    recyclerView,
+                                                    "Client out of date",
+                                                    Snackbar.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                    } catch (e: ConnectException) {
                                         Snackbar.make(
                                             recyclerView,
-                                            "Authentication Error",
-                                            Snackbar.LENGTH_LONG
-                                        ).show()
-                                    }
-                                } else {
-                                    withContext(Dispatchers.Main) {
-                                        Snackbar.make(
-                                            recyclerView,
-                                            "Client out of date",
+                                            "Network Error",
                                             Snackbar.LENGTH_SHORT
-                                        ).show()
+                                        )
+                                            .show()
                                     }
+
                                 }
-                            } catch (e: ConnectException) {
-                                Snackbar.make(recyclerView, "Network Error", Snackbar.LENGTH_SHORT)
-                                    .show()
+                                editText.text!!.clear()
                             }
-
                         }
-                        editText.text!!.clear()
                     }
-                }
 
-                // Refresh views to get new messages
+                    // Refresh views to get new messages
 
-                var lastMessage: Int = 0
+                    var lastMessage: Int = 0
 
-                msgSyncJob = CoroutineScope(IO).launch {
-                    while (true) {
-                        val adapter = recyclerView.adapter as MessagesRecyclerAdapter
-                        withContext(Main) {
-                            adapter.notifyItemRangeChanged(lastMessage, (recyclerView.adapter as MessagesRecyclerAdapter).itemCount)
-                            lastMessage = adapter.itemCount
+                    msgSyncJob = CoroutineScope(IO).launch {
+                        while (true) {
+                            val adapter = recyclerView.adapter as MessagesRecyclerAdapter
+                            if (lastMessage != adapter.itemCount) {
+                                withContext(Main) {
+                                    adapter.notifyItemRangeChanged(
+                                        lastMessage,
+                                        adapter.itemCount
+                                    )
+                                    lastMessage = adapter.itemCount
+                                    recyclerView.smoothScrollToPosition(lastMessage-1)
+                                }
+                            }
+                            delay(100)
                         }
-                        delay(100)
                     }
-                }
 
+                    withContext(Main) {progressBar.visibility = GONE}
+
+                }
             }
         }
 
@@ -192,6 +224,8 @@ class MessagesFragment : Fragment() {
     }
 
     override fun onDestroy() {
+        // TODO: Fix this crashing if i press back too fast
+        PrefsHelper(requireContext()).openEncryptedPrefs("secure_prefs").edit().remove("current").apply()
         msgSyncJob.cancel()
         super.onDestroy()
     }

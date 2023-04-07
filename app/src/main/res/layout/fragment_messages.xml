@@ -9,13 +9,14 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/messages_inputlayout">
+        app:layout_constraintBottom_toTopOf="@+id/messages_inputlayout"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messages_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
+            android:layout_gravity="bottom"
             android:layout_marginBottom="24dp"
             android:overScrollMode="never" />
     </FrameLayout>
@@ -59,12 +60,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@null"
+        android:contentDescription="send message"
         android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/messages_inputlayout"
         app:layout_constraintEnd_toEndOf="@+id/messages_inputlayout"
         app:layout_constraintTop_toTopOf="@+id/messages_inputlayout"
         app:srcCompat="@drawable/baseline_send_24"
-        android:contentDescription="send message"
         tools:ignore="HardcodedText" />
+
+    <ProgressBar
+        android:id="@+id/messages_loading_progressbar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -71,7 +71,6 @@ class KnockCodeFragment : Fragment() {
             progBarAnimator.duration = 1000
             progBarAnimator.interpolator = LinearInterpolator()
 
-
             val knockerOnClickListener : OnClickListener = OnClickListener {
 
                 // Stop input end timer

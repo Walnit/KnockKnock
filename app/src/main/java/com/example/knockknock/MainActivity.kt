@@ -1,5 +1,6 @@
 package com.example.knockknock
 
+import android.app.ActivityManager
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -18,9 +19,13 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -42,12 +47,16 @@ class MainActivity : AppCompatActivity() {
                 )
                 if (securePreferences.contains("name")) {
                     sharedPreferences.edit().putBoolean("isFirstTime", false).commit()
-                    startService(Intent(this, MessageSyncService::class.java))
+                    val workRequest = PeriodicWorkRequestBuilder<MessageSyncWorker>(15, TimeUnit.MINUTES)
+                        .build()
+                    WorkManager.getInstance(this).enqueueUniquePeriodicWork("KnockSyncMessages", ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, workRequest)
                 }
             }.launch(Intent(this, OnboardingActivity::class.java))
 
         } else {
-            startService(Intent(this, MessageSyncService::class.java))
+            val workRequest = PeriodicWorkRequestBuilder<MessageSyncWorker>(15, TimeUnit.MINUTES)
+                .build()
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork("KnockSyncMessages", ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, workRequest)
         }
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -81,6 +90,10 @@ class MainActivity : AppCompatActivity() {
                                     Snackbar.make(toolbar, "Contact unhidden!", Snackbar.LENGTH_SHORT).show()
                                     toolbar.menu.findItem(R.id.messages_menu_show).isVisible = false
                                     toolbar.menu.findItem(R.id.messages_menu_hide).isVisible = true
+                                    toolbar.menu.findItem(R.id.messages_menu_hide).setOnMenuItemClickListener {
+                                        navController.navigate(R.id.action_messagesFragment_to_hideContactFragment, args)
+                                        true
+                                    }
                                 }
                             }
                             true
@@ -126,6 +139,4 @@ class MainActivity : AppCompatActivity() {
         }
         return super.dispatchTouchEvent(event)
     }
-
-
 }

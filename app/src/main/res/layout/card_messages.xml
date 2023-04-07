@@ -4,11 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginStart="12dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
     app:cardCornerRadius="4dp"
-    app:cardElevation="3dp"
+    app:cardElevation="2dp"
     app:contentPadding="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,15 +29,29 @@
             android:id="@+id/messages_card_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:maxWidth="300dp"
-            android:text="TextView"
+            android:minWidth="90dp"
+            android:text="alsdfhjalkjhsdflkahsdkfhlafds"
             android:textAlignment="textStart"
             android:textColor="?attr/colorOnBackground"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/messages_card_sender"
-            app:layout_constraintTop_toBottomOf="@+id/messages_card_sender"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/messages_card_time"
             tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/messages_card_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="00:00"
+            app:layout_constraintStart_toEndOf="@+id/messages_card_sender"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

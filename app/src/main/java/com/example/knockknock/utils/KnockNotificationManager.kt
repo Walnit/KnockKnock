@@ -1,13 +1,19 @@
 package com.example.knockknock.utils
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.PendingIntent
+import android.app.*
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Color
 import android.view.View
-import android.app.NotificationManager
 import android.content.Intent
+import android.graphics.drawable.Icon
+import android.media.AudioAttributes
+import android.net.Uri
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.example.knockknock.R
+import com.example.knockknock.structures.KnockMessage
+import kotlin.random.Random
 
 object KnockNotificationManager {
 
@@ -21,14 +27,25 @@ object KnockNotificationManager {
         return channel
     }
 
-    fun createChatNotificationChannel(id: String, name: String, description: String, importance: Int, context: Context) {
+    fun createChatNotificationChannel(id: String, name: String, description: String, importance: Int, vibration: Boolean, context: Context) : NotificationChannel {
         val channel = NotificationChannel(id, name, importance)
         channel.description = description
         channel.enableLights(true)
         channel.lightColor = Color.parseColor("#E55934")
-        channel.enableVibration(true)
-        notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        channel.enableVibration(vibration)
+        if (vibration) {
+            with (context.resources) {
+                channel.setSound(Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                    .authority(getResourcePackageName(R.raw.knockknock))
+                    .appendPath(getResourceTypeName(R.raw.knockknock))
+                    .appendPath(getResourceEntryName(R.raw.knockknock))
+                    .build(), AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
+            }
+        }
+        notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+        return channel
     }
 
     fun sendSystemNotification(channel: NotificationChannel, title: String, content: String, context: Context){
@@ -37,7 +54,7 @@ object KnockNotificationManager {
         val notification = Notification.Builder(context, channelID)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.baseline_info_24)
             .setChannelId(channelID).build()
         notificationManager.notify(notificationID, notification)
     }
@@ -84,27 +101,15 @@ object KnockNotificationManager {
 //        notificationManager.notify(83, builder3.build())
 //        notificationManager.notify(80, builderSummary.build())
 //    }
-//    fun directReplyNotification(view : View){
-//        val channelID = "com.example.notifydemo.news"
-//        val KEY_TEXT_REPLY = "key_text_reply"
-//        val remoteInput = RemoteInput.Builder(KEY_TEXT_REPLY)
-//            .setLabel(getString(R.string.replyPrompt)).build()
-//        val intentResult = Intent(this, ResultActivity::class.java)
-//        val pendingIntent = PendingIntent.getActivity(this@MainActivity, 0,
-//            intentResult, PendingIntent.FLAG_UPDATE_CURRENT)
-//        val icon = Icon.createWithResource(this@MainActivity,
-//            android.R.drawable.ic_dialog_info)
-//        val replyAction = Notification.Action.Builder(icon, "Reply", pendingIntent)
-//            .addRemoteInput(remoteInput).build()
-//        val notification = Notification.Builder(this@MainActivity, channelID)
-//            .setColor(ContextCompat.getColor(this@MainActivity,
-//                R.color.design_default_color_primary))
-//            .setContentTitle(getString(R.string.egNote))
-//            .setContentText(getString(R.string.egText))
-//            .setSmallIcon(android.R.drawable.ic_dialog_info)
-//            .setChannelId(channelID)
-//            .setActions(replyAction).build()
-//        notificationManager.notify(101, notification)
-//    }
+    fun sendChatReplyNotification(channel: NotificationChannel, title: String, context: Context) {
+        val notificationID = Random(title.hashCode()).nextInt()
+        val channelID = channel.id
+        val notification = Notification.Builder(context, channelID)
+            .setContentTitle(title)
+            .setContentText("Content Hidden for Privacy")
+            .setSmallIcon(R.drawable.baseline_chat_24)
+            .setChannelId(channelID).build()
+        notificationManager.notify(notificationID, notification)
+    }
 
 }
