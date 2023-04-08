@@ -4,15 +4,9 @@ import android.app.*
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Color
-import android.view.View
-import android.content.Intent
-import android.graphics.drawable.Icon
 import android.media.AudioAttributes
 import android.net.Uri
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.example.knockknock.R
-import com.example.knockknock.structures.KnockMessage
 import kotlin.random.Random
 
 object KnockNotificationManager {

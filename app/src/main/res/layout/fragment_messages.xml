@@ -7,6 +7,7 @@
 
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/messages_inputlayout"
@@ -19,6 +20,7 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="24dp"
             android:overScrollMode="never" />
+
     </FrameLayout>
 
     <Button
@@ -33,6 +35,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/messages_inputlayout"
         tools:ignore="RtlSymmetry" />
+
+    <LinearLayout
+        android:id="@+id/messages_attach_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        android:overScrollMode="never"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/messages_attach_btn"
+        app:layout_constraintStart_toStartOf="@+id/messages_attach_btn">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/messages_attach_image_btn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:insetBottom="8dp"
+            android:text="Image"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            app:icon="@drawable/baseline_image_24" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/messages_photo_btn"
+            style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:text="Take Photo"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            app:icon="@drawable/baseline_photo_camera_24" />
+
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/messages_inputlayout"

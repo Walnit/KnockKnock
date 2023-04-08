@@ -1,4 +1,4 @@
-package com.example.knockknock.structures
+package com.example.knockknock.database
 
 @kotlinx.serialization.Serializable
 data class KnockMessage (
@@ -8,7 +8,7 @@ data class KnockMessage (
     val type: KnockMessageType
 ) {
     enum class KnockMessageType {
-        TEXT, PREKEY
+        TEXT, IMAGE
     }
 
     override fun equals(other: Any?): Boolean {

@@ -1,54 +1,61 @@
 package com.example.knockknock
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.Environment
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.OvershootInterpolator
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.size
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.networking.SendMessage
 import com.example.knockknock.networking.ServerProperties
 import com.example.knockknock.networking.structures.SendMessageRequest
 import com.example.knockknock.signal.*
-import com.example.knockknock.structures.KnockClient
-import com.example.knockknock.structures.KnockClientSerializable
-import com.example.knockknock.structures.KnockMessage
+import com.example.knockknock.database.KnockMessage
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import org.whispersystems.libsignal.SessionBuilder
 import org.whispersystems.libsignal.SessionCipher
 import org.whispersystems.libsignal.SignalProtocolAddress
 import org.whispersystems.libsignal.ecc.Curve
 import org.whispersystems.libsignal.protocol.PreKeySignalMessage
 import org.whispersystems.libsignal.protocol.SignalMessage
+import java.io.File
 import java.net.ConnectException
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class MessagesFragment : Fragment() {
 
     lateinit var msgSyncJob: Job
     lateinit var messageTarget: String
+    lateinit var imageUri: Uri
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,6 +69,95 @@ class MessagesFragment : Fragment() {
         if (target != null) {
 
             messageTarget = target
+            val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {success ->
+                if (!success) Snackbar.make(view, "Unable to Open Camera!", Snackbar.LENGTH_SHORT).show()
+                else {
+
+                    val retrofit = ServerProperties.getRetrofitInstance()
+
+                    // Signal magic as well
+
+                    val prefsHelper = PrefsHelper(requireContext())
+                    var securePreferences = prefsHelper.openEncryptedPrefs("secure_prefs")
+                    val store = KnockSignalProtocolStore(requireContext())
+
+                    val sessionCipher = SessionCipher(
+                        store,
+                        SignalProtocolAddress(target, 1)
+                    )
+
+
+
+                    CoroutineScope(IO).launch {
+                        val imageBytes = requireContext().contentResolver.openInputStream(imageUri)!!.readBytes()
+                        val cipherMessage = sessionCipher.encrypt(imageBytes)
+
+                        if (cipherMessage is PreKeySignalMessage) {
+                            // Its very scuffed to do this so imma just tell them to send a text message first
+                            Snackbar.make(view, "Please send some text messages first!", Snackbar.LENGTH_SHORT).show()
+                        } else if (cipherMessage is SignalMessage) {
+                            val serMessage = ("I" + Base64.encodeToString(
+                                cipherMessage.serialize(),
+                                Base64.NO_WRAP
+                            )).toByteArray(StandardCharsets.UTF_8)
+
+                            val call = retrofit.create(SendMessage::class.java).sendMessage(
+                                SendMessageRequest(
+                                    securePreferences.getString("name", null)!!,
+                                    target,
+                                    Base64.encodeToString(serMessage, Base64.NO_WRAP),
+                                    Base64.encodeToString(
+                                        Curve.calculateSignature(
+                                            store.identityKeyPair.privateKey,
+                                            serMessage
+                                        ), Base64.NO_WRAP
+                                    )
+                                )
+                            )
+
+                            try {
+                                val result = call.execute()
+                                if (result.code() == 200) {
+                                    MessageDatabase.writeMessages(
+                                        target, arrayOf(
+                                            KnockMessage(
+                                                store.getLocalKnockClient().name,
+                                                System.currentTimeMillis(),
+                                                imageBytes,
+                                                KnockMessage.KnockMessageType.IMAGE
+                                            )
+                                        ), requireContext()
+                                    )
+
+                                } else if (result.code() == 403) {
+                                    withContext(Dispatchers.Main) {
+                                        Snackbar.make(
+                                            view,
+                                            "Authentication Error",
+                                            Snackbar.LENGTH_LONG
+                                        ).show()
+                                    }
+                                } else {
+                                    withContext(Dispatchers.Main) {
+                                        Snackbar.make(
+                                            view,
+                                            "Client out of date",
+                                            Snackbar.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            } catch (e: ConnectException) {
+                                Snackbar.make(
+                                    view,
+                                    "Network Error",
+                                    Snackbar.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+                    }
+                }
+            }
 
             CoroutineScope(IO).launch {
 
@@ -191,6 +287,76 @@ class MessagesFragment : Fragment() {
                                 editText.text!!.clear()
                             }
                         }
+
+                        // Code for attaching images and stuff
+
+                        val attachBtn = view.findViewById<Button>(R.id.messages_attach_btn)
+                        val attachLayout = view.findViewById<LinearLayout>(R.id.messages_attach_layout)
+                        val takePhotoBtn = view.findViewById<Button>(R.id.messages_photo_btn)
+
+                        attachBtn.setOnClickListener {
+                            if (attachLayout.visibility == GONE) {
+                                attachLayout.visibility = VISIBLE
+                                AnimatorInflater.loadAnimator(requireContext(), R.animator.messages_attach_in)
+                                    .apply {
+                                        setTarget(attachLayout)
+                                        interpolator = OvershootInterpolator()
+                                        start()
+                                    }
+                            } else {
+                                AnimatorInflater.loadAnimator(requireContext(), R.animator.messages_attach_out)
+                                    .apply {
+                                        setTarget(attachLayout)
+                                        interpolator = AnticipateInterpolator()
+                                        addListener(object : AnimationListener,
+                                            Animator.AnimatorListener {
+                                            override fun onAnimationStart(animation: Animation?) {
+                                                // Do nothing
+                                            }
+
+                                            override fun onAnimationEnd(arg0: Animation) {
+                                                attachLayout.visibility = GONE
+                                            }
+
+                                            override fun onAnimationRepeat(animation: Animation?) {
+                                                // Do nothing
+                                            }
+
+                                            override fun onAnimationStart(animation: Animator) {
+                                                // Do nothing
+                                            }
+
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                attachLayout.visibility = GONE
+                                            }
+
+                                            override fun onAnimationCancel(animation: Animator) {
+                                                // Do nothing
+                                            }
+
+                                            override fun onAnimationRepeat(animation: Animator) {
+                                                // Do nothing
+                                            }
+                                        })
+                                        start()
+                                    }
+                            }
+                        }
+                        takePhotoBtn.setOnClickListener {
+
+                            val tmpImgFile = File.createTempFile(
+                                "IMG_" + SimpleDateFormat(
+                                    "yyyyMMdd_HHmmss",
+                                    requireContext().resources.configuration.locales.get(0))
+                                        .format(Date(System.currentTimeMillis())
+                            ), ".jpg", requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)).apply {
+                                createNewFile()
+                                deleteOnExit()
+                            }
+                            imageUri = FileProvider.getUriForFile(requireContext(), requireContext().packageName+".fileprovider", tmpImgFile);
+                            takePhotoLauncher.launch(imageUri)
+                        }
+
                     }
 
                     // Refresh views to get new messages

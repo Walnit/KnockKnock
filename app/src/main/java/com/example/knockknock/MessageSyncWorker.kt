@@ -2,22 +2,17 @@ package com.example.knockknock
 
 import android.app.NotificationManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Base64
-import android.util.Log
 import androidx.work.*
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.networking.GetMessages
 import com.example.knockknock.networking.ServerProperties
 import com.example.knockknock.networking.structures.GetMessagesRequest
 import com.example.knockknock.signal.KnockSignalProtocolStore
-import com.example.knockknock.structures.KnockMessage
+import com.example.knockknock.database.KnockMessage
 import com.example.knockknock.utils.KnockNotificationManager
 import com.example.knockknock.utils.PrefsHelper
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -133,6 +128,24 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                                             KnockMessage.KnockMessageType.TEXT
                                         )
                                     )
+                                } else if (scuffedContent[0] == 'I') { // ooh its an image
+                                    val plaintext: ByteArray = sessionCipher.decrypt(
+                                        SignalMessage(
+                                            Base64.decode(
+                                                actualContent,
+                                                Base64.NO_WRAP
+                                            )
+                                        )
+                                    )
+
+                                    knockMessages.add(
+                                        KnockMessage(
+                                            target,
+                                            System.currentTimeMillis(),
+                                            plaintext,
+                                            KnockMessage.KnockMessageType.IMAGE
+                                        )
+                                    )
                                 }
 
                             }
@@ -185,6 +198,10 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                                 if (knockMessages.last().type == KnockMessage.KnockMessageType.TEXT) {
                                     secureContacts.edit()
                                         .putString(target, String(knockMessages.last().content))
+                                        .apply()
+                                } else {
+                                    secureContacts.edit()
+                                        .putString(target, "Image")
                                         .apply()
                                 }
                             }

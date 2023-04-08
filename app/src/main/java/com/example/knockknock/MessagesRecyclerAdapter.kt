@@ -3,19 +3,18 @@ package com.example.knockknock
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.Resources.Theme
-import android.util.Base64
-import android.util.Log
-import android.view.Gravity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.graphics.alpha
 import androidx.recyclerview.widget.RecyclerView
 import com.example.knockknock.database.MessageDatabase
-import com.example.knockknock.structures.KnockMessage
+import com.example.knockknock.database.KnockMessage
 import com.example.knockknock.utils.PrefsHelper
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
@@ -41,6 +40,7 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
         private var msgSender : TextView
         private var msgText : TextView
         private var msgTime : TextView
+        private var imgView: ImageView
         private var cardView: CardView
         private var res: Resources
         private var theme: Theme
@@ -52,6 +52,7 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
             msgSender = msgView.findViewById(R.id.messages_card_sender)
             msgText = msgView.findViewById(R.id.messages_card_text)
             msgTime = msgView.findViewById(R.id.messages_card_time)
+            imgView = msgView.findViewById(R.id.messages_card_image)
             cardView = msgView as CardView
             res = msgView.context.resources
             theme = msgView.context.theme
@@ -60,9 +61,8 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
 
             normalParams.marginStart = (res.displayMetrics.density * 12).toInt()
             normalParams.topMargin = (res.displayMetrics.density * 8).toInt()
-
-
         }
+
         fun bindItems(msg : KnockMessage, username: String, condense: Boolean){
 
             if (msg.sender == username) {
@@ -83,11 +83,20 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
             msgSender.text = msg.sender
             msgTime.text = SimpleDateFormat("HH:mm", res.configuration.locales.get(0)).format(Date(msg.timestamp))
             if (msg.type == KnockMessage.KnockMessageType.TEXT) {
+                imgView.visibility = View.GONE
+                msgText.visibility = View.VISIBLE
                 msgText.text = String(msg.content, StandardCharsets.UTF_8)
+            } else if (msg.type == KnockMessage.KnockMessageType.IMAGE) {
+                imgView.visibility = View.VISIBLE
+                msgText.visibility = View.GONE
+                val bmp = BitmapFactory.decodeByteArray(msg.content, 0, msg.content.size)
+                val imgDims = (res.displayMetrics.density * 300).toInt()
+                if (bmp.width > bmp.height) {
+                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bmp, imgDims, (imgDims*(bmp.height.toFloat()/bmp.width)).toInt(), false))
+                } else {
+                    imgView.setImageBitmap(Bitmap.createScaledBitmap(bmp, (imgDims*(bmp.width.toFloat()/bmp.height)).toInt(), imgDims, false))
+                }
             }
-
         }
-
     }
-
 }
