@@ -1,9 +1,13 @@
 package com.example.knockknock.database
 
-@kotlinx.serialization.Serializable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class KnockMessage (
     val sender: String,
-    val timestamp: Long,
+    @PrimaryKey val timestamp: Long,
     val content: ByteArray,
     val type: KnockMessageType
 ) {
@@ -32,6 +36,4 @@ data class KnockMessage (
         result = 31 * result + type.hashCode()
         return result
     }
-
-
 }

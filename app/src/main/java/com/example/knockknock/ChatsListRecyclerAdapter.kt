@@ -2,6 +2,7 @@
 
 package com.example.knockknock
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,15 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.knockknock.utils.PrefsHelper
 
 @Suppress("unused", "unused", "unused", "unused", "unused")
-class ChatsListRecyclerAdapter(private val chats: Array<String>) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
+class ChatsListRecyclerAdapter(context: Context) : RecyclerView.Adapter<ChatsListRecyclerAdapter.ViewHolder>() {
+
+    var secureContacts = PrefsHelper(context).openEncryptedPrefs("secure_contacts")
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v : View = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_chatslist,parent,false)
@@ -21,11 +28,12 @@ class ChatsListRecyclerAdapter(private val chats: Array<String>) : RecyclerView.
     }
 
     override fun getItemCount(): Int {
-        return chats.size
+        return secureContacts.all.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindItems(chats[position])
+        val chatTitle = secureContacts.all.keys.toTypedArray()[position]
+        holder.bindItems(chatTitle, secureContacts.getString(chatTitle, "")!!)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,9 +50,9 @@ class ChatsListRecyclerAdapter(private val chats: Array<String>) : RecyclerView.
             }
 
         }
-        fun bindItems(chat: String){
-            chatTitle.text = chat
-//            chatPreview.text = chp.detail
+        fun bindItems(title: String, lastMessage: String){
+            chatTitle.text = title
+            chatPreview.text = lastMessage
 //            itemImage.setImageResource(chp.images)
         }
     }

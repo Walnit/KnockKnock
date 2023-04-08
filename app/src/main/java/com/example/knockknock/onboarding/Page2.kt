@@ -26,6 +26,7 @@ import com.example.knockknock.networking.ServerProperties
 import com.example.knockknock.networking.structures.AddUserRequest
 import com.example.knockknock.networking.structures.UserExistsRequest
 import com.example.knockknock.signal.KnockSignalProtocolStore
+import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -36,6 +37,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.ConnectException
+import java.util.UUID
 
 class Page2 : Fragment() {
     override fun onCreateView(
@@ -63,13 +65,7 @@ class Page2 : Fragment() {
                 val masterKey = MasterKey.Builder(requireContext())
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
 
-                var securePreferences = EncryptedSharedPreferences.create(
-                    requireContext(),
-                    "secure_prefs",
-                    masterKey,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                )
+                var securePreferences = PrefsHelper(requireContext()).openEncryptedPrefs("secure_prefs")
                 // Generate required information
 
                 val identityKeyPair = KeyHelper.generateIdentityKeyPair()
@@ -100,6 +96,7 @@ class Page2 : Fragment() {
                                     )
                                     .putInt("RID", registrationId)
                                     .putString("name", username)
+                                    .putString("db_pass", UUID.randomUUID().toString())
                                     .commit() // Store IdentityKeyPair and RegistrationID
 
                                 val store = KnockSignalProtocolStore(requireContext())

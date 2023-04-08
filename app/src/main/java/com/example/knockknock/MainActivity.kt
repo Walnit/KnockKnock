@@ -8,11 +8,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -37,14 +39,7 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         if (sharedPreferences.getBoolean("isFirstTime", true)) {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                var securePreferences = EncryptedSharedPreferences.create(
-                    this,
-                    "secure_prefs",
-                    MasterKey.Builder(this)
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                )
+                var securePreferences = PrefsHelper(this).openEncryptedPrefs("secure_prefs")
                 if (securePreferences.contains("name")) {
                     sharedPreferences.edit().putBoolean("isFirstTime", false).commit()
                     val workRequest = PeriodicWorkRequestBuilder<MessageSyncWorker>(15, TimeUnit.MINUTES)
@@ -61,13 +56,34 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
-        val appBarConfiguration = AppBarConfiguration(navController.graph, findViewById<DrawerLayout>(R.id.drawer_layout))
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
 
         findViewById<NavigationView>(R.id.nav_view)
             .setupWithNavController(navController)
         toolbar.setupWithNavController(navController, appBarConfiguration)
         toolbar.inflateMenu(R.menu.toolbar_menu)
+
+        drawerLayout.addDrawerListener(object: DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                // none
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                drawerView.findViewById<TextView>(R.id.drawer_username).text =
+                    PrefsHelper(applicationContext).openEncryptedPrefs("secure_prefs").getString("name", null)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                // none
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+                // none
+            }
+
+        })
 
         navController.addOnDestinationChangedListener { _, destination, args ->
             toolbar.menu.forEach {menuItem ->

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.*
 
 class ChatsListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -32,22 +33,11 @@ class ChatsListFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.chatslist_recyclerview)
         val layoutManager = LinearLayoutManager(context)
 
-        val masterKey = MasterKey.Builder(requireContext())
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build()
-
-        var secureContacts = EncryptedSharedPreferences.create(
-            requireContext(),
-            "secure_contacts",
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-
-        val adapter = ChatsListRecyclerAdapter(secureContacts.all.keys.toTypedArray())
+        val adapter = ChatsListRecyclerAdapter(requireContext())
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
 
-        if (secureContacts.all.size > 4) {
+        if (adapter.itemCount > 4) {
             view.findViewById<ConstraintLayout>(R.id.chatslist_empty_hint).visibility = View.GONE
         }
 

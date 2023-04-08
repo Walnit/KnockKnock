@@ -218,7 +218,6 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                         "Have you set up the app correctly?",
                         applicationContext
                     )
-                } else {
                 }
             } catch (e: ConnectException) {
                 KnockNotificationManager.sendSystemNotification(
@@ -228,6 +227,7 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                     applicationContext
                 )
             } catch (e: SocketTimeoutException) {
+                e.printStackTrace()
                 KnockNotificationManager.sendSystemNotification(
                     KnockNotificationManager.createSystemNotificationChannel(applicationContext),
                     "Network Error",
@@ -235,7 +235,7 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                     applicationContext
                 )
             }
-            delay(100)
+            delay(250)
         }
     }
 
