@@ -22,6 +22,7 @@ import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.core.widget.addTextChangedListener
 import androidx.navigation.findNavController
+import androidx.transition.TransitionInflater
 import com.example.knockknock.knockcode.KnockCode
 import com.example.knockknock.knockcode.KnockInput
 import com.example.knockknock.utils.PrefsHelper
@@ -38,7 +39,9 @@ class KnockCodeFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_knock_code, container, false)
-
+        val inflater = TransitionInflater.from(requireContext())
+        enterTransition = inflater.inflateTransition(R.transition.fade)
+        returnTransition = inflater.inflateTransition(R.transition.fade)
         var sequence: KnockCode? = null
         var endJob: Job? = null
 

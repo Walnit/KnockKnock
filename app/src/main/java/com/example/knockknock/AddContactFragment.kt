@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import androidx.transition.TransitionInflater
 import com.example.knockknock.networking.GetKnockRequestStatus
 import com.example.knockknock.networking.GetUsernameExists
 import com.example.knockknock.networking.SendKnockRequest
@@ -54,6 +55,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import java.io.IOException
 import java.net.ConnectException
+import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
 
 class AddContactFragment : Fragment() {
@@ -62,7 +64,9 @@ class AddContactFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_add_contact, container, false)
-
+        val inflater = TransitionInflater.from(requireContext())
+        enterTransition = inflater.inflateTransition(R.transition.slide_in)
+        returnTransition = inflater.inflateTransition(R.transition.fade)
         val navController = findNavController()
 
         with(view) {
@@ -154,7 +158,7 @@ class AddContactFragment : Fragment() {
 
                             sessionBuilder.process(targetClient.getPreKeyBundle())
 
-                            secureContacts.edit().putString(targetClient.name, rawJson).commit()
+                            secureContacts.edit().putString(targetClient.name, "New Contact!").commit()
 
                             withContext(Dispatchers.Main) {
                                 val bundle = bundleOf("name" to targetClient.name)
@@ -183,6 +187,8 @@ class AddContactFragment : Fragment() {
                         }
                     }
                 } catch (e: ConnectException) {
+                    Snackbar.make(textInputLayout, "Network Error", Snackbar.LENGTH_SHORT).show()
+                } catch (e: UnknownHostException) {
                     Snackbar.make(textInputLayout, "Network Error", Snackbar.LENGTH_SHORT).show()
                 }
             }
@@ -252,6 +258,8 @@ class AddContactFragment : Fragment() {
                             )
                         } catch (e: IOException) {
                             CoroutineHelper.textInputError("Network Error", textInputLayout)
+                        } catch (e: UnknownHostException) {
+                            Snackbar.make(textInputLayout, "Network Error", Snackbar.LENGTH_SHORT).show()
                         }
                     }
                 }

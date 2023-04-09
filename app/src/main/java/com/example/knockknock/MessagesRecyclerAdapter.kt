@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.content.res.Resources.Theme
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.os.bundleOf
+import androidx.navigation.NavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.database.KnockMessage
@@ -20,19 +24,20 @@ import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MessagesRecyclerAdapter(private val target: String, private val context: Context): RecyclerView.Adapter<MessagesRecyclerAdapter.ViewHolder>() {
+class MessagesRecyclerAdapter(private val target: String, private val navController: NavController, private val context: Context): RecyclerView.Adapter<MessagesRecyclerAdapter.ViewHolder>() {
     private val username = PrefsHelper(context).openEncryptedPrefs("secure_prefs").getString("name", null)
+    private val messages = MessageDatabase.getMessages(target, context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v : View = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_messages,parent,false)
         return ViewHolder(v)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val messages = MessageDatabase.getMessages(target, context)!!
-        holder.bindItems(messages[position], username!!, (position > 0 && messages[position-1].sender == messages[position].sender))
+        if (messages != null) {
+            holder.bindItems(messages[position], username!!, (position > 0 && messages[position-1].sender == messages[position].sender), navController)
+        }
     }
     override fun getItemCount(): Int {
-        val messages = MessageDatabase.getMessages(target, context)
         return messages?.size ?: 0
     }
 
@@ -63,11 +68,13 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
             normalParams.topMargin = (res.displayMetrics.density * 8).toInt()
         }
 
-        fun bindItems(msg : KnockMessage, username: String, condense: Boolean){
+        fun bindItems(msg : KnockMessage, username: String, condense: Boolean, navController: NavController){
 
             if (msg.sender == username) {
+                msgSender.text = "${msg.sender} (You)"
                 msgSender.setTextColor(res.getColor(R.color.orange_700, theme))
             } else {
+                msgSender.text = msg.sender
                 msgSender.setTextColor(res.getColor(R.color.teal_500, theme))
             }
 
@@ -80,7 +87,7 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
                 cardView.layoutParams = normalParams
             }
 
-            msgSender.text = msg.sender
+
             msgTime.text = SimpleDateFormat("HH:mm", res.configuration.locales.get(0)).format(Date(msg.timestamp))
             if (msg.type == KnockMessage.KnockMessageType.TEXT) {
                 imgView.visibility = View.GONE
@@ -93,8 +100,16 @@ class MessagesRecyclerAdapter(private val target: String, private val context: C
                 val imgDims = (res.displayMetrics.density * 300).toInt()
                 if (bmp.width > bmp.height) {
                     imgView.setImageBitmap(Bitmap.createScaledBitmap(bmp, imgDims, (imgDims*(bmp.height.toFloat()/bmp.width)).toInt(), false))
+                    imgView.setOnClickListener {
+                        val bundle = bundleOf("imgData" to Bitmap.createScaledBitmap(bmp, 2048, (2048*(bmp.height.toFloat()/bmp.width)).toInt(), true))
+                        navController.navigate(R.id.action_messagesFragment_to_viewImageFragment, bundle, null, FragmentNavigatorExtras(imgView to "image"))
+                    }
                 } else {
                     imgView.setImageBitmap(Bitmap.createScaledBitmap(bmp, (imgDims*(bmp.width.toFloat()/bmp.height)).toInt(), imgDims, false))
+                    imgView.setOnClickListener {
+                        val bundle = bundleOf("imgData" to Bitmap.createScaledBitmap(bmp, (2048*(bmp.width.toFloat()/bmp.height)).toInt(), 2048, true))
+                        navController.navigate(R.id.action_messagesFragment_to_viewImageFragment, bundle, null, FragmentNavigatorExtras(imgView to "image"))
+                    }
                 }
             }
         }

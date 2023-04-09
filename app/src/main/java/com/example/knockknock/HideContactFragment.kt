@@ -1,6 +1,8 @@
 package com.example.knockknock
 
 import android.animation.ObjectAnimator
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,6 +20,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
 import androidx.navigation.findNavController
+import androidx.transition.TransitionInflater
 import com.example.knockknock.knockcode.KnockCode
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -31,7 +34,8 @@ class HideContactFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_hide_contact, container, false)
-
+        val inflater = TransitionInflater.from(requireContext())
+        enterTransition = inflater.inflateTransition(R.transition.fade)
         var sequence: KnockCode? = null
         var endJob: Job? = null
 
@@ -150,7 +154,10 @@ class HideContactFragment : Fragment() {
                 builder.setTitle("What's a Knock Code?")
                 builder.setMessage(getString(R.string.knock_faq))
                 builder.setIcon(R.drawable.baseline_info_24)
-                builder.setPositiveButton("Ok") {_,_->}
+                builder.setNegativeButton("Close") {_,_->}
+                builder.setPositiveButton("Open Video Demo") {_,_->
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=3NpNJbpSODM")))
+                }
                 builder.create().show()
             }
 

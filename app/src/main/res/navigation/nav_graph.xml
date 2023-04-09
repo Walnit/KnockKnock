@@ -11,9 +11,6 @@
         tools:layout="@layout/fragment_chatslist">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
-        <action
             android:id="@+id/action_ChatsList_to_messagesFragment"
             app:destination="@id/messagesFragment" />
         <action
@@ -22,16 +19,9 @@
         <action
             android:id="@+id/action_ChatsList_to_knockCodeFragment"
             app:destination="@id/knockCodeFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.knockknock.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/ChatsList" />
+            android:id="@+id/action_ChatsList_to_tempFragment"
+            app:destination="@id/tempFragment" />
     </fragment>
     <fragment
         android:id="@+id/messagesFragment"
@@ -47,6 +37,9 @@
         <action
             android:id="@+id/action_messagesFragment_to_hideContactFragment"
             app:destination="@id/hideContactFragment" />
+        <action
+            android:id="@+id/action_messagesFragment_to_viewImageFragment"
+            app:destination="@id/viewImageFragment" />
     </fragment>
     <fragment
         android:id="@+id/addContactFragment"
@@ -77,4 +70,17 @@
             android:id="@+id/action_hideContactFragment_to_ChatsList"
             app:destination="@id/ChatsList" />
     </fragment>
+    <fragment
+        android:id="@+id/viewImageFragment"
+        android:name="com.example.knockknock.ViewImageFragment"
+        android:label="fragment_view_image"
+        tools:layout="@layout/fragment_view_image" >
+        <action
+            android:id="@+id/action_viewImageFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tempFragment"
+        android:name="com.example.knockknock.TempFragment"
+        android:label="TempFragment" />
 </navigation>

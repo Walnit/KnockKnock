@@ -47,17 +47,17 @@
         app:layout_constraintBottom_toTopOf="@+id/messages_attach_btn"
         app:layout_constraintStart_toStartOf="@+id/messages_attach_btn">
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/messages_attach_image_btn"
             style="@style/Widget.Material3.Button.ElevatedButton.Icon"
             android:layout_width="wrap_content"
             android:layout_height="52dp"
             android:insetBottom="8dp"
-            android:text="Image"
+            android:text="From Gallery"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
             app:icon="@drawable/baseline_image_24" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/messages_photo_btn"
             style="@style/Widget.Material3.Button.ElevatedButton.Icon"
             android:layout_width="wrap_content"

@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity() {
             toolbar.invalidateMenu()
 
             if (destination.id == R.id.messagesFragment) {
-
                 if (args != null) {
                     toolbar.title = args.getString("name")
                     if (args.containsKey("hidden")) {
@@ -102,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                             hiddenContacts.all.forEach { (t, any) ->
                                 if (any is String && any == args.getString("name")) {
                                     hiddenContacts.edit().remove(t).apply()
-                                    PrefsHelper(this).openEncryptedPrefs("secure_contacts").edit().putString(any, "unhidden").apply()
+                                    PrefsHelper(this).openEncryptedPrefs("secure_contacts").edit().putString(any, "Unhidden!").apply()
                                     Snackbar.make(toolbar, "Contact unhidden!", Snackbar.LENGTH_SHORT).show()
                                     toolbar.menu.findItem(R.id.messages_menu_show).isVisible = false
                                     toolbar.menu.findItem(R.id.messages_menu_hide).isVisible = true
@@ -135,6 +134,26 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     toolbar.title = "Hide Contact"
                 }
+            } else if (destination.id == R.id.ChatsList) {
+                toolbar.menu.findItem(R.id.chatslist_menu_refresh).apply {
+                    isVisible = true
+                    setOnMenuItemClickListener {
+                        navController.navigate(R.id.action_ChatsList_to_tempFragment)
+                        true
+                    }
+                }
+                toolbar.menu.findItem(R.id.chatslist_menu_daemon).apply {
+                    isVisible = true
+                    setOnMenuItemClickListener {
+                        val workRequest = PeriodicWorkRequestBuilder<MessageSyncWorker>(15, TimeUnit.MINUTES)
+                            .build()
+                        WorkManager.getInstance(this@MainActivity).enqueueUniquePeriodicWork("KnockSyncMessages", ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, workRequest)
+                        Snackbar.make(toolbar, "Sync Service Restarted!", Snackbar.LENGTH_SHORT).show()
+                        true
+                    }
+                }
+            } else if (destination.id == R.id.tempFragment) {
+                toolbar.title = "Refreshing..."
             }
         }
 

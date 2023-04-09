@@ -24,6 +24,7 @@ import org.whispersystems.libsignal.protocol.PreKeySignalMessage
 import org.whispersystems.libsignal.protocol.SignalMessage
 import java.net.ConnectException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
 
 class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
@@ -227,6 +228,14 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                     applicationContext
                 )
             } catch (e: SocketTimeoutException) {
+                e.printStackTrace()
+                KnockNotificationManager.sendSystemNotification(
+                    KnockNotificationManager.createSystemNotificationChannel(applicationContext),
+                    "Network Error",
+                    "Please check that you are connected to the internet!",
+                    applicationContext
+                )
+            } catch (e: UnknownHostException) {
                 e.printStackTrace()
                 KnockNotificationManager.sendSystemNotification(
                     KnockNotificationManager.createSystemNotificationChannel(applicationContext),
