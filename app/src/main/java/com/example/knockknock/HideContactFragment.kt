@@ -6,8 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,15 +13,15 @@ import android.view.animation.LinearInterpolator
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
-import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.transition.TransitionInflater
 import com.example.knockknock.knockcode.KnockCode
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 
@@ -150,7 +148,7 @@ class HideContactFragment : Fragment() {
             // what if im stupid? knock code edition
             val knockCodeFAQ = findViewById<Button>(R.id.hidden_what_btn)
             knockCodeFAQ.setOnClickListener {
-                val builder = AlertDialog.Builder(requireContext())
+                val builder = MaterialAlertDialogBuilder(requireContext(), com.google.android.material.R.style.MaterialAlertDialog_Material3)
                 builder.setTitle("What's a Knock Code?")
                 builder.setMessage(getString(R.string.knock_faq))
                 builder.setIcon(R.drawable.baseline_info_24)

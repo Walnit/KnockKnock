@@ -48,7 +48,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import org.whispersystems.libsignal.SessionBuilder
-import org.whispersystems.libsignal.SessionCipher
 import org.whispersystems.libsignal.SignalProtocolAddress
 import org.whispersystems.libsignal.ecc.Curve
 import retrofit2.Call
@@ -93,7 +92,7 @@ class AddContactFragment : Fragment() {
 
             knockButton.setOnClickListener {
 
-
+                knockButton.isEnabled = false
                 val target: String = textInputLayout.editText?.text.toString()
                 val call: Call<ResponseBody> =
                     retrofit.create(SendKnockRequest::class.java).addContact(

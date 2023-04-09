@@ -7,15 +7,18 @@
         <item
             android:id="@+id/ChatsList"
             android:icon="@drawable/baseline_chat_24"
-            android:title="Chats" />
+            android:title="Chats"
+            tools:ignore="HardcodedText" />
         <item
             android:id="@+id/addContactFragment"
             android:icon="@drawable/baseline_waving_hand_24"
-            android:title="Add Contact"/>
+            android:title="Add Contact"
+            tools:ignore="HardcodedText" />
         <item
             android:id="@+id/knockCodeFragment"
             android:icon="@drawable/baseline_grid_3x3_24"
-            android:title="Hidden Contacts"/>
+            android:title="Hidden Contacts"
+            tools:ignore="HardcodedText" />
 
     </group>
 </menu>

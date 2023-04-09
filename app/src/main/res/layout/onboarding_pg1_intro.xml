@@ -32,7 +32,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/ob_1_2"
         app:layout_constraintEnd_toEndOf="@+id/ob_1_2"
-        app:layout_constraintStart_toStartOf="@+id/ob_1_2" />
+        app:layout_constraintStart_toStartOf="@+id/ob_1_2"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/ob_1_2"
@@ -47,7 +48,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/ob_1_4"
@@ -60,7 +62,8 @@
         app:layout_constraintBottom_toTopOf="@+id/ob_1_5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/ob_1_5"
@@ -77,6 +80,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:rippleColor="?colorPrimaryVariant" />
+        app:rippleColor="?colorPrimaryVariant"
+        tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

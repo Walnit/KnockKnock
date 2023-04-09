@@ -23,7 +23,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ob_3_plus_layout"
-        app:rippleColor="?colorPrimaryVariant" />
+        app:rippleColor="?colorPrimaryVariant"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -48,7 +49,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView17"
@@ -59,7 +61,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/textView16"
         app:layout_constraintEnd_toEndOf="@+id/textView16"
-        app:layout_constraintStart_toStartOf="@+id/textView16" />
+        app:layout_constraintStart_toStartOf="@+id/textView16"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/ob_3_fist"
@@ -87,7 +90,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
             android:text="Press "
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:layout_width="52dp"
@@ -103,7 +107,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="to add contacts later"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <TextView
@@ -116,7 +121,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView19"
@@ -126,6 +132,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/textView18"
         app:layout_constraintStart_toStartOf="@+id/textView18"
-        app:layout_constraintTop_toBottomOf="@+id/textView18" />
+        app:layout_constraintTop_toBottomOf="@+id/textView18"
+        tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

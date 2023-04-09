@@ -11,8 +11,6 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.knockknock.utils.PrefsHelper
 
 @Suppress("unused", "unused", "unused", "unused", "unused")

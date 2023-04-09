@@ -10,9 +10,7 @@ import com.example.knockknock.structures.KnockClient
 import org.whispersystems.libsignal.IdentityKey
 import org.whispersystems.libsignal.IdentityKeyPair
 import org.whispersystems.libsignal.SignalProtocolAddress
-import org.whispersystems.libsignal.ecc.ECKeyPair
 import org.whispersystems.libsignal.state.*
-import org.whispersystems.libsignal.state.impl.InMemorySessionStore
 import org.whispersystems.libsignal.util.KeyHelper
 
 class KnockSignalProtocolStore(val context: Context) : SignalProtocolStore {
@@ -245,7 +243,7 @@ class KnockSignalProtocolStore(val context: Context) : SignalProtocolStore {
                         ), Base64.NO_WRAP
                     )
                 )
-                Log.i("TAG", "loading session for ${address?.name}")
+                Log.i("TAG", "loading session for ${address.name}")
             }
         }
 

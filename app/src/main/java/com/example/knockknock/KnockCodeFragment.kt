@@ -1,35 +1,29 @@
 package com.example.knockknock
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
-import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.transition.TransitionInflater
 import com.example.knockknock.knockcode.KnockCode
-import com.example.knockknock.knockcode.KnockInput
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
-import java.lang.Math.min
 
 class KnockCodeFragment : Fragment() {
 

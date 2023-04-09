@@ -1,17 +1,7 @@
 package com.example.knockknock.database
 
 import android.content.Context
-import androidx.security.crypto.EncryptedFile
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.knockknock.utils.PrefsHelper
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.nio.charset.StandardCharsets
 import java.util.*
 
 object MessageDatabase {

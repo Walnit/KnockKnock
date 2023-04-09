@@ -55,7 +55,8 @@
             android:insetBottom="8dp"
             android:text="From Gallery"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-            app:icon="@drawable/baseline_image_24" />
+            app:icon="@drawable/baseline_image_24"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/messages_photo_btn"
@@ -64,7 +65,8 @@
             android:layout_height="52dp"
             android:text="Take Photo"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-            app:icon="@drawable/baseline_photo_camera_24" />
+            app:icon="@drawable/baseline_photo_camera_24"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 

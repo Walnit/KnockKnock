@@ -108,7 +108,7 @@ class MessageSyncWorker(context: Context, workerParameters: WorkerParameters) : 
                                         )
                                     ) {
                                         // target not in contacts or hidden, must be new
-                                        secureContacts.edit().putString(target, actualContent)
+                                        secureContacts.edit().putString(target, "New message!")
                                             .commit()
                                     }
 

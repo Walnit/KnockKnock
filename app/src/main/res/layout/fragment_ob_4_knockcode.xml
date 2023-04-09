@@ -28,7 +28,8 @@
             android:text="1"
             app:cornerRadius="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/hidden_knocker_2"
@@ -40,7 +41,8 @@
             android:text="2"
             app:cornerRadius="0dp"
             app:layout_constraintStart_toEndOf="@id/hidden_knocker_1"
-            app:layout_constraintTop_toTopOf="@+id/hidden_knocker_1" />
+            app:layout_constraintTop_toTopOf="@+id/hidden_knocker_1"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/hidden_knocker_3"
@@ -52,7 +54,8 @@
             android:text="3"
             app:cornerRadius="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/hidden_knocker_1" />
+            app:layout_constraintTop_toBottomOf="@id/hidden_knocker_1"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/hidden_knocker_4"
@@ -64,7 +67,8 @@
             android:text="4"
             app:cornerRadius="0dp"
             app:layout_constraintStart_toEndOf="@id/hidden_knocker_3"
-            app:layout_constraintTop_toBottomOf="@id/hidden_knocker_2" />
+            app:layout_constraintTop_toBottomOf="@id/hidden_knocker_2"
+            tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -80,7 +84,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView25"
@@ -91,7 +96,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/textView24"
         app:layout_constraintEnd_toEndOf="@+id/textView24"
-        app:layout_constraintStart_toStartOf="@+id/textView24" />
+        app:layout_constraintStart_toStartOf="@+id/textView24"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/ob_4_btn"
@@ -107,8 +113,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ob_3_plus_layout"
-        app:rippleColor="?colorPrimaryVariant" />
+        app:rippleColor="?colorPrimaryVariant"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView27"
@@ -120,7 +126,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/knocker_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/knocker_layout"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/textView28"
@@ -130,6 +137,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/textView27"
         app:layout_constraintStart_toStartOf="@+id/textView27"
-        app:layout_constraintTop_toBottomOf="@+id/textView27" />
+        app:layout_constraintTop_toBottomOf="@+id/textView27"
+        tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

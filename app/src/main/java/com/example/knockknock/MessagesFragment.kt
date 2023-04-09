@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -25,17 +24,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
+import com.example.knockknock.database.KnockMessage
 import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.networking.SendMessage
 import com.example.knockknock.networking.ServerProperties
 import com.example.knockknock.networking.structures.SendMessageRequest
-import com.example.knockknock.signal.*
-import com.example.knockknock.database.KnockMessage
+import com.example.knockknock.signal.KnockSignalProtocolStore
 import com.example.knockknock.utils.PrefsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -104,7 +102,7 @@ class MessagesFragment : Fragment() {
                 val hiddenContacts = prefsHelper.openEncryptedPrefs("hidden_contacts")
 
                 if (!secureContacts.contains(target) && !hiddenContacts.all.values.contains(target)) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Main) {
                         val builder = AlertDialog.Builder(requireContext())
                         builder.setTitle("Error!")
                         builder.setMessage("You have not requested to contact this user!")
@@ -208,7 +206,7 @@ class MessagesFragment : Fragment() {
                                                         .apply()
 
                                                 } else if (result.code() == 403) {
-                                                    withContext(Dispatchers.Main) {
+                                                    withContext(Main) {
                                                         Snackbar.make(
                                                             recyclerView,
                                                             "Authentication Error",
@@ -216,7 +214,7 @@ class MessagesFragment : Fragment() {
                                                         ).show()
                                                     }
                                                 } else {
-                                                    withContext(Dispatchers.Main) {
+                                                    withContext(Main) {
                                                         Snackbar.make(
                                                             recyclerView,
                                                             "Client out of date",
@@ -328,7 +326,7 @@ class MessagesFragment : Fragment() {
                                     requireContext(),
                                     requireContext().packageName + ".fileprovider",
                                     tmpImgFile
-                                );
+                                )
                                 takePhotoLauncher.launch(imageUri)
                                 attachLayout.visibility = GONE
                             }
@@ -442,7 +440,7 @@ class MessagesFragment : Fragment() {
                         )
 
                     } else if (result.code() == 403) {
-                        withContext(Dispatchers.Main) {
+                        withContext(Main) {
                             Snackbar.make(
                                 view,
                                 "Authentication Error",
@@ -450,7 +448,7 @@ class MessagesFragment : Fragment() {
                             ).show()
                         }
                     } else {
-                        withContext(Dispatchers.Main) {
+                        withContext(Main) {
                             Snackbar.make(
                                 view,
                                 "Client out of date",

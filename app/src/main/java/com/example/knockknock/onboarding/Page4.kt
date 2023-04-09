@@ -2,16 +2,13 @@ package com.example.knockknock.onboarding
 
 import android.animation.Animator
 import android.animation.AnimatorInflater
-import android.animation.ValueAnimator
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateInterpolator
 import android.widget.Button
-import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import com.example.knockknock.R
 
 

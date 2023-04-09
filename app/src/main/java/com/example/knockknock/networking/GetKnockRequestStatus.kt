@@ -1,6 +1,5 @@
 package com.example.knockknock.networking
 
-import com.example.knockknock.networking.structures.AddContactRequest
 import com.example.knockknock.networking.structures.GetAddContactResultRequest
 import okhttp3.ResponseBody
 import retrofit2.Call

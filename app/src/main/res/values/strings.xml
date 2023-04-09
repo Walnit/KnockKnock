@@ -3,7 +3,6 @@
     <!-- Strings used for fragments for navigation -->
     <string name="second_fragment_label">Second Fragment</string>
     <string name="previous">Previous</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="knock_faq">A Knock Code is an easy way to secure your contacts. To use it, tap
         the boxes in any order and rhythm you want, and remember it. Enter the same sequence of

@@ -5,7 +5,6 @@ import android.content.res.Resources
 import android.content.res.Resources.Theme
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +16,8 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
-import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.database.KnockMessage
+import com.example.knockknock.database.MessageDatabase
 import com.example.knockknock.utils.PrefsHelper
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat

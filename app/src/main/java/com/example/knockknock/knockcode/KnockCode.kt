@@ -1,6 +1,5 @@
 package com.example.knockknock.knockcode
 
-import com.example.knockknock.KnockCodeFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.decodeFromString

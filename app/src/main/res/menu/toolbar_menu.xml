@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/chatslist_menu_refresh"
         android:title="Refresh Chats List"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
     <item
         android:id="@+id/chatslist_menu_daemon"
         android:title="Resync Messages"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        tools:ignore="HardcodedText" />
     <item
         android:id="@+id/messages_menu_hide"
         android:title="Hide"
         android:icon="@drawable/baseline_visibility_off_24"
-        app:showAsAction="withText"/>
+        app:showAsAction="withText"
+        tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/messages_menu_show"
         android:title="Show"
         android:icon="@drawable/baseline_visibility_24"
-        app:showAsAction="withText"/>
+        app:showAsAction="withText"
+        tools:ignore="HardcodedText" />
 
 </menu>

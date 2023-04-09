@@ -12,11 +12,8 @@ import android.util.Base64
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getDrawableOrThrow
@@ -39,7 +36,7 @@ import org.whispersystems.libsignal.util.KeyHelper
 import retrofit2.Call
 import java.net.ConnectException
 import java.net.UnknownHostException
-import java.util.UUID
+import java.util.*
 
 class PageSetup : Fragment() {
     override fun onCreateView(
